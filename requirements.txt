@@ -1,0 +1,7 @@
+# Python dependencies for the project
+# Core testing framework
+pytest>=7.4.0
+pytest-cov>=4.1.0
+
+# No additional dependencies required for string_operations module
+# The reverse_string function uses only Python standard library features
