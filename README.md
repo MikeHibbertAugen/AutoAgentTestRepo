@@ -23,11 +23,15 @@ pip install -e .
 ### Quick Start
 
 ```python
-from src.string_utils import reverse_string
+from src.string_utils import reverse_string, capitalize_string
 
 # Reverse a string
 result = reverse_string("hello")
 print(result)  # Output: "olleh"
+
+# Capitalize a string
+result = capitalize_string("hello world")
+print(result)  # Output: "Hello world"
 ```
 
 ## String Operations
@@ -82,6 +86,45 @@ except TypeError as e:
     print(e)  # Output: "Input must be a string, got <class 'int'>"
 ```
 
+### Capitalize String
+
+Capitalize the first character of a string, leaving the rest unchanged.
+
+**Usage:**
+
+```python
+from src.string_utils import capitalize_string
+
+# Basic usage
+result = capitalize_string("hello")
+print(result)  # Output: "Hello"
+
+# Works with sentences
+result = capitalize_string("hello world")
+print(result)  # Output: "Hello world"
+
+# Already capitalized strings remain unchanged
+result = capitalize_string("Hello")
+print(result)  # Output: "Hello"
+
+# Empty strings are handled safely
+result = capitalize_string("")
+print(result)  # Output: ""
+
+# Handles mixed case
+result = capitalize_string("hELLO")
+print(result)  # Output: "HELLO"
+```
+
+**Features:**
+- Type-safe with comprehensive input validation
+- Handles empty strings and edge cases
+- Preserves all characters except the first
+- Idempotent operation
+- 100% test coverage
+
+For detailed API documentation, see [String Utils Documentation](docs/string_utils.md).
+
 ## Development
 
 ### Running Tests
@@ -124,7 +167,8 @@ AutoAgentTestRepo/
 │   ├── __init__.py
 │   └── test_string_utils.py
 ├── docs/
-│   └── api_reference.md
+│   ├── api_reference.md
+│   └── string_utils.md
 ├── .gitignore
 ├── .mypy.ini
 ├── pyproject.toml
@@ -134,7 +178,9 @@ AutoAgentTestRepo/
 
 ## Documentation
 
-For detailed API documentation, see [API Reference](docs/api_reference.md).
+For detailed API documentation, see:
+- [API Reference](docs/api_reference.md)
+- [String Utils Documentation](docs/string_utils.md)
 
 ## Contributing
 

@@ -5,14 +5,14 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "string-utils-phase1"
 version = "0.1.0"
-description = "A string manipulation utility library - Phase 1: String Reverse"
+description = "A string manipulation utility library - Phase 1: String Reverse & Capitalize"
 readme = "README.md"
 requires-python = ">=3.8"
 license = {text = "MIT"}
 authors = [
     {name = "Development Team", email = "dev@example.com"}
 ]
-keywords = ["string", "utilities", "reverse"]
+keywords = ["string", "utilities", "reverse", "capitalize"]
 classifiers = [
     "Development Status :: 3 - Alpha",
     "Intended Audience :: Developers",
@@ -111,3 +111,17 @@ omit = [
 precision = 2
 show_missing = true
 skip_covered = false
+
+[tool.mypy]
+python_version = "3.8"
+warn_return_any = true
+warn_unused_configs = true
+disallow_untyped_defs = true
+disallow_incomplete_defs = true
+check_untyped_defs = true
+no_implicit_optional = true
+warn_redundant_casts = true
+warn_unused_ignores = true
+warn_no_return = true
+strict_equality = true
+files = ["src"]
