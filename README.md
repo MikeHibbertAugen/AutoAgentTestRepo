@@ -1,10 +1,10 @@
 # AutoAgentTestRepo
 
-This is a test repository for string manipulation utilities.
+This is a test repository for string manipulation utilities and timezone features.
 
 ## Features
 
-This package provides string manipulation utilities with a focus on type safety, comprehensive testing, and clean code practices.
+This package provides string manipulation utilities and New Zealand datetime retrieval with a focus on type safety, comprehensive testing, and clean code practices.
 
 ### Installation
 
@@ -24,6 +24,7 @@ pip install -e .
 
 ```python
 from src.string_utils import reverse_string, capitalize_string
+from src.nz_datetime import get_nz_datetime
 
 # Reverse a string
 result = reverse_string("hello")
@@ -32,6 +33,10 @@ print(result)  # Output: "olleh"
 # Capitalize a string
 result = capitalize_string("hello world")
 print(result)  # Output: "Hello world"
+
+# Get current New Zealand datetime
+nz_time = get_nz_datetime()
+print(nz_time)  # Output: {'datetime': '2024-01-15T14:30:45+13:00', 'timezone': 'Pacific/Auckland', ...}
 ```
 
 ## String Operations
@@ -125,6 +130,44 @@ print(result)  # Output: "HELLO"
 
 For detailed API documentation, see [String Utils Documentation](docs/string_utils.md).
 
+## New Zealand Datetime
+
+Retrieve the current date and time in New Zealand timezone using the WorldTimeAPI.
+
+**Usage:**
+
+```python
+from src.nz_datetime import get_nz_datetime
+
+# Get current NZ datetime
+result = get_nz_datetime()
+print(result)
+# Output: {
+#     'datetime': '2024-01-15T14:30:45.123456+13:00',
+#     'timezone': 'Pacific/Auckland',
+#     'utc_offset': '+13:00',
+#     'day_of_week': 1,
+#     'day_of_year': 15
+# }
+
+# Handle errors gracefully
+result = get_nz_datetime()
+if 'error' in result:
+    print(f"Error: {result['error']}")
+else:
+    print(f"Current NZ time: {result['datetime']}")
+```
+
+**Features:**
+- Retrieves real-time datetime from WorldTimeAPI
+- Returns structured data with timezone information
+- Comprehensive error handling for network issues
+- No authentication or API keys required
+- Configurable timeout for API requests
+- Full test coverage with mocked API calls
+
+For detailed documentation, see [NZ Datetime Documentation](docs/nz_datetime.md).
+
 ## Development
 
 ### Running Tests
@@ -138,6 +181,7 @@ pytest tests/ -v --cov=src --cov-report=html
 
 # Run specific test file
 pytest tests/test_string_utils.py -v
+pytest tests/test_nz_datetime.py -v
 ```
 
 ### Code Quality
@@ -162,13 +206,16 @@ black src/ tests/ && ruff check src/ tests/ && mypy src/ && pytest tests/ -v --c
 AutoAgentTestRepo/
 ├── src/
 │   ├── __init__.py
-│   └── string_utils.py
+│   ├── string_utils.py
+│   └── nz_datetime.py
 ├── tests/
 │   ├── __init__.py
-│   └── test_string_utils.py
+│   ├── test_string_utils.py
+│   └── test_nz_datetime.py
 ├── docs/
 │   ├── api_reference.md
-│   └── string_utils.md
+│   ├── string_utils.md
+│   └── nz_datetime.md
 ├── .gitignore
 ├── .mypy.ini
 ├── pyproject.toml
@@ -181,6 +228,7 @@ AutoAgentTestRepo/
 For detailed API documentation, see:
 - [API Reference](docs/api_reference.md)
 - [String Utils Documentation](docs/string_utils.md)
+- [NZ Datetime Documentation](docs/nz_datetime.md)
 
 ## Contributing
 

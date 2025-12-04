@@ -1,0 +1,11 @@
+I notice there's a misunderstanding in the request. `unittest.mock` is a standard Python library module, not a file that needs to be created. It's part of Python's standard library and is used for mocking in tests.
+
+Based on the implementation plan, I should be creating one of these files instead:
+
+1. `src/nz_datetime.py` - Main module
+2. `tests/test_nz_datetime.py` - Test module
+3. `docs/nz_datetime.md` - Documentation
+4. Updates to `requirements-dev.txt`
+5. Updates to `README.md`
+
+Could you please clarify which specific file from the implementation plan you'd like me to create? The most logical starting point would be `src/nz_datetime.py` (the main module).
