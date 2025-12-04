@@ -1,0 +1,65 @@
+# Agent Automation - Project Architecture Configuration
+# This file defines the required project structure and coding standards
+
+template: "python-src-layout"
+projectType: "python-library"
+
+structure:
+  requiredDirectories:
+    - src/
+    - tests/
+    - docs/
+
+  requiredFiles:
+    - README.md
+    - requirements-dev.txt
+    - pyproject.toml
+    - .mypy.ini
+
+  forbiddenPatterns:
+    - "duplicate files in root and src/"
+    - "*.pyc in repository"
+    - "__pycache__ in repository"
+    - "source code files in project root (must be in src/)"
+
+conventions:
+  moduleLocation: "src/"
+  testLocation: "tests/"
+  configLocation: "."
+  docsLocation: "docs/"
+
+  naming:
+    modules: "snake_case"
+    classes: "PascalCase"
+    functions: "snake_case"
+    constants: "UPPER_SNAKE_CASE"
+
+standards:
+  - "All public functions must have docstrings with parameter descriptions"
+  - "All modules must have corresponding test files in tests/ directory"
+  - "Configuration files (.mypy.ini, pyproject.toml, etc.) must be at project root only"
+  - "No code duplication between root directory and src/ directory"
+  - "ALL source code modules (.py files) must be placed in src/ directory"
+  - "Documentation files (.md) should be in docs/ directory, except README.md which stays at root"
+  - "Test files must mirror the structure of src/ (e.g., src/foo.py -> tests/test_foo.py)"
+  - "Use type hints for all function parameters and return values"
+  - "Follow PEP 8 style guidelines"
+
+# Example of correct structure:
+# AutoAgentTestRepo/
+#   ├── .agent-automation/
+#   │   └── architecture.yaml
+#   ├── src/
+#   │   ├── __init__.py
+#   │   ├── string_utils.py
+#   │   └── math_utils.py
+#   ├── tests/
+#   │   ├── test_string_utils.py
+#   │   └── test_math_utils.py
+#   ├── docs/
+#   │   ├── string_utils.md
+#   │   └── math_utils.md
+#   ├── README.md
+#   ├── pyproject.toml
+#   ├── .mypy.ini
+#   └── requirements-dev.txt
