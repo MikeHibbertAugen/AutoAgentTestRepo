@@ -1,0 +1,7 @@
+pytest>=7.4.0
+pytest-cov>=4.1.0
+black>=23.7.0
+ruff>=0.0.282
+mypy>=1.4.1
+coverage>=7.2.7
+pytest-xdist>=3.3.1
