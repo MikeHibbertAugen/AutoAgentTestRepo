@@ -1,10 +1,10 @@
 # AutoAgentTestRepo
 
-This is a test repository for string manipulation utilities.
+This is a test repository for string manipulation utilities and timezone services.
 
 ## Features
 
-This package provides string manipulation utilities with a focus on type safety, comprehensive testing, and clean code practices.
+This package provides string manipulation utilities and timezone services with a focus on type safety, comprehensive testing, and clean code practices.
 
 ### Installation
 
@@ -24,6 +24,7 @@ pip install -e .
 
 ```python
 from src.string_utils import reverse_string, capitalize_string
+from src.nelson_time import get_current_time
 
 # Reverse a string
 result = reverse_string("hello")
@@ -32,6 +33,10 @@ print(result)  # Output: "olleh"
 # Capitalize a string
 result = capitalize_string("hello world")
 print(result)  # Output: "Hello world"
+
+# Get current time in Nelson, New Zealand
+nelson_time = get_current_time()
+print(nelson_time)  # Output: Current date and time in Nelson
 ```
 
 ## String Operations
@@ -123,7 +128,54 @@ print(result)  # Output: "HELLO"
 - Idempotent operation
 - 100% test coverage
 
-For detailed API documentation, see [String Utils Documentation](docs/string_utils.md).
+## Nelson Time Service
+
+Get the current date and time in Nelson, New Zealand using the WorldTimeAPI service.
+
+**Usage:**
+
+```python
+from src.nelson_time import get_current_time
+
+# Get current time in Nelson
+try:
+    current_time = get_current_time()
+    print(f"Current time in Nelson: {current_time}")
+except Exception as e:
+    print(f"Error fetching time: {e}")
+```
+
+**Features:**
+- Fetches real-time data from WorldTimeAPI
+- Uses Pacific/Auckland timezone (Nelson's timezone)
+- Comprehensive error handling for network failures
+- 5-second timeout for API requests
+- Type-safe with full type hints
+- Well-documented with detailed docstrings
+
+**Error Handling:**
+
+```python
+from src.nelson_time import get_current_time, NelsonTimeError
+
+try:
+    time = get_current_time()
+    print(time)
+except NelsonTimeError as e:
+    print(f"Failed to get Nelson time: {e}")
+```
+
+**API Integration:**
+
+This service integrates with the free WorldTimeAPI service:
+- Endpoint: `https://worldtimeapi.org/api/timezone/Pacific/Auckland`
+- No authentication required
+- Returns JSON with timezone and datetime information
+- See [API Integration Documentation](docs/api_integration.md) for details
+
+For detailed API documentation, see:
+- [String Utils Documentation](docs/string_utils.md)
+- [API Integration Documentation](docs/api_integration.md)
 
 ## Development
 
@@ -138,6 +190,7 @@ pytest tests/ -v --cov=src --cov-report=html
 
 # Run specific test file
 pytest tests/test_string_utils.py -v
+pytest tests/test_nelson_time.py -v
 ```
 
 ### Code Quality
@@ -162,13 +215,16 @@ black src/ tests/ && ruff check src/ tests/ && mypy src/ && pytest tests/ -v --c
 AutoAgentTestRepo/
 ├── src/
 │   ├── __init__.py
-│   └── string_utils.py
+│   ├── string_utils.py
+│   └── nelson_time.py
 ├── tests/
 │   ├── __init__.py
-│   └── test_string_utils.py
+│   ├── test_string_utils.py
+│   └── test_nelson_time.py
 ├── docs/
 │   ├── api_reference.md
-│   └── string_utils.md
+│   ├── string_utils.md
+│   └── api_integration.md
 ├── .gitignore
 ├── .mypy.ini
 ├── pyproject.toml
@@ -176,11 +232,26 @@ AutoAgentTestRepo/
 └── README.md
 ```
 
+## Requirements
+
+### Runtime Dependencies
+- `requests` - HTTP library for API calls
+
+### Development Dependencies
+- `pytest` - Testing framework
+- `pytest-cov` - Code coverage reporting
+- `black` - Code formatting
+- `ruff` - Fast Python linter
+- `mypy` - Static type checker
+
+See `requirements-dev.txt` for specific versions.
+
 ## Documentation
 
 For detailed API documentation, see:
 - [API Reference](docs/api_reference.md)
 - [String Utils Documentation](docs/string_utils.md)
+- [API Integration Documentation](docs/api_integration.md)
 
 ## Contributing
 
