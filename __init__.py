@@ -1,7 +1,7 @@
 """
 Counter package initialization.
 
-This package provides a Counter class with maximum value constraint.
+This package provides a Counter class with configurable start and end values.
 """
 
 from .counter import Counter

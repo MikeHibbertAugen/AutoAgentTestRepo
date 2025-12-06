@@ -1,6 +1,6 @@
 # AutoAgentTestRepo
 
-This is a test repository for string manipulation utilities, timezone services, and a basic counter implementation.
+This is a test repository for string manipulation utilities, timezone services, and a configurable counter implementation.
 
 ## Features
 
@@ -39,59 +39,85 @@ print(result)  # Output: "Hello world"
 nelson_time = get_current_time()
 print(nelson_time)  # Output: Current date and time in Nelson
 
-# Use the counter
+# Use the counter with default range (1 to 10)
 counter = Counter()
-print(counter.get_value())  # Output: 1
+print(counter.current)  # Output: 1
 counter.increment()
-print(counter.get_value())  # Output: 2
+print(counter.current)  # Output: 2
+
+# Use the counter with custom range
+counter = Counter(start=5, end=15)
+print(counter.current)  # Output: 5
+counter.increment()
+print(counter.current)  # Output: 6
 ```
 
 ## Counter
 
-A basic counter implementation that starts at 1 and has a maximum value constraint of 10.
+A configurable counter implementation with customizable start and end values, supporting initialization, increment, reset, and boundary checking.
 
 **Usage:**
 
 ```python
 from src.counter import Counter
 
-# Initialize counter (starts at 1)
+# Initialize counter with default range (1 to 10)
 counter = Counter()
-print(counter.get_value())  # Output: 1
+print(counter.current)  # Output: 1
 
 # Increment the counter
-success = counter.increment()
-print(counter.get_value())  # Output: 2
-print(success)  # Output: True
+counter.increment()
+print(counter.current)  # Output: 2
+
+# Check if counter has reached end value
+print(counter.has_reached_end())  # Output: False
 
 # Increment multiple times
-for _ in range(5):
+for _ in range(8):
     counter.increment()
-print(counter.get_value())  # Output: 7
+print(counter.current)  # Output: 10
+print(counter.has_reached_end())  # Output: True
 
-# Try to exceed maximum value
-counter = Counter()
-for _ in range(10):
-    result = counter.increment()
-print(counter.get_value())  # Output: 10
-print(result)  # Output: False (cannot increment beyond 10)
+# Try to increment beyond end value
+try:
+    counter.increment()
+except ValueError as e:
+    print(e)  # Output: Cannot increment beyond end value
+
+# Reset the counter
+counter.reset()
+print(counter.current)  # Output: 1
+
+# Initialize with custom range
+counter = Counter(start=5, end=15)
+print(counter.current)  # Output: 5
+counter.increment()
+print(counter.current)  # Output: 6
+
+# Negative ranges are supported
+counter = Counter(start=-5, end=5)
+print(counter.current)  # Output: -5
 ```
 
 **Features:**
-- Starts at value 1 by default
-- Maximum value constraint of 10
-- Returns `False` when attempting to increment beyond maximum
+- Configurable start and end values
+- Default range from 1 to 10
+- Increment with automatic boundary checking
+- Reset functionality to return to start value
+- Check if counter has reached end value
+- Raises `ValueError` when attempting to increment beyond end
 - Type-safe with full type hints
 - 100% test coverage
 - Clear and simple API
 
 **API:**
-- `__init__()` - Initialize counter at value 1
-- `increment() -> bool` - Increment counter by 1, returns `False` if at maximum value
-- `get_value() -> int` - Get current counter value
-- `MAX_VALUE` - Class constant for maximum value (10)
+- `__init__(start: int = 1, end: int = 10)` - Initialize counter with optional start and end values
+- `increment() -> None` - Increment counter by 1, raises `ValueError` if at end value
+- `reset() -> None` - Reset counter to start value
+- `has_reached_end() -> bool` - Check if counter is at end value
+- `current: int` - Public attribute for current counter value
 
-For detailed documentation, see [Counter Documentation](docs/counter.md)
+For detailed documentation, see [Counter API Documentation](docs/counter_api.md)
 
 ## String Operations
 
@@ -228,7 +254,7 @@ This service integrates with the free WorldTimeAPI service:
 - See [API Integration Documentation](docs/api_integration.md) for details
 
 For detailed API documentation, see:
-- [Counter Documentation](docs/counter.md)
+- [Counter API Documentation](docs/counter_api.md)
 - [String Utils Documentation](docs/string_utils.md)
 - [API Integration Documentation](docs/api_integration.md)
 
@@ -237,16 +263,22 @@ For detailed API documentation, see:
 ### Running Tests
 
 ```bash
-# Run all tests with coverage
-pytest tests/ -v --cov=src
-
-# Generate HTML coverage report
-pytest tests/ -v --cov=src --cov-report=html
+# Run all unit tests with coverage
+pytest tests/ -v --cov=src --cov-report=term-missing
 
 # Run specific test file
 pytest tests/test_string_utils.py -v
 pytest tests/test_nelson_time.py -v
 pytest tests/test_counter.py -v
+
+# Run BDD tests with behave
+behave tests/features/
+
+# Generate HTML coverage report
+pytest tests/ -v --cov=src --cov-report=html
+
+# Run all tests (unit + BDD)
+pytest tests/ -v --cov=src && behave tests/features/
 ```
 
 ### Code Quality
@@ -278,12 +310,19 @@ AutoAgentTestRepo/
 │   ├── __init__.py
 │   ├── test_string_utils.py
 │   ├── test_nelson_time.py
-│   └── test_counter.py
+│   ├── test_counter.py
+│   └── features/
+│       ├── __init__.py
+│       ├── counter.feature
+│       ├── environment.py
+│       └── steps/
+│           ├── __init__.py
+│           └── counter_steps.py
 ├── docs/
 │   ├── api_reference.md
 │   ├── string_utils.md
 │   ├── api_integration.md
-│   └── counter.md
+│   └── counter_api.md
 ├── .gitignore
 ├── .mypy.ini
 ├── pyproject.toml
@@ -299,6 +338,7 @@ AutoAgentTestRepo/
 ### Development Dependencies
 - `pytest` - Testing framework
 - `pytest-cov` - Code coverage reporting
+- `behave` - BDD testing framework
 - `black` - Code formatting
 - `ruff` - Fast Python linter
 - `mypy` - Static type checker
@@ -309,17 +349,17 @@ See `requirements-dev.txt` for specific versions.
 
 For detailed API documentation, see:
 - [API Reference](docs/api_reference.md)
-- [Counter Documentation](docs/counter.md)
+- [Counter API Documentation](docs/counter_api.md)
 - [String Utils Documentation](docs/string_utils.md)
 - [API Integration Documentation](docs/api_integration.md)
 
 ## Contributing
 
-1. Ensure all tests pass: `pytest tests/ -v`
+1. Ensure all tests pass: `pytest tests/ -v && behave tests/features/`
 2. Format code: `black src/ tests/`
 3. Lint code: `ruff check src/ tests/`
 4. Type check: `mypy src/`
-5. Maintain test coverage above 90%
+5. Maintain test coverage above 95%
 
 ## License
 
