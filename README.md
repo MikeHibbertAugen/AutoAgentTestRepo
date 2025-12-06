@@ -60,34 +60,36 @@ counter = Counter()
 print(counter.get_value())  # Output: 1
 
 # Increment the counter
-success = counter.increment()
+message = counter.increment()
 print(counter.get_value())  # Output: 2
-print(success)  # Output: True
+print(message)  # Output: None (successful increment)
 
 # Increment multiple times
-for _ in range(5):
+for _ in range(7):
     counter.increment()
-print(counter.get_value())  # Output: 7
+print(counter.get_value())  # Output: 9
+
+# Reach maximum value
+counter.increment()
+print(counter.get_value())  # Output: 10
 
 # Try to exceed maximum value
-counter = Counter()
-for _ in range(10):
-    result = counter.increment()
-print(counter.get_value())  # Output: 10
-print(result)  # Output: False (cannot increment beyond 10)
+result = counter.increment()
+print(counter.get_value())  # Output: 10 (remains at maximum)
+print(result)  # Output: "Counter has reached maximum value of 10"
 ```
 
 **Features:**
 - Starts at value 1 by default
 - Maximum value constraint of 10
-- Returns `False` when attempting to increment beyond maximum
+- Returns appropriate message when attempting to increment beyond maximum
 - Type-safe with full type hints
 - 100% test coverage
 - Clear and simple API
 
 **API:**
 - `__init__()` - Initialize counter at value 1
-- `increment() -> bool` - Increment counter by 1, returns `False` if at maximum value
+- `increment() -> Optional[str]` - Increment counter by 1, returns message if at maximum value
 - `get_value() -> int` - Get current counter value
 - `MAX_VALUE` - Class constant for maximum value (10)
 
@@ -247,6 +249,12 @@ pytest tests/ -v --cov=src --cov-report=html
 pytest tests/test_string_utils.py -v
 pytest tests/test_nelson_time.py -v
 pytest tests/test_counter.py -v
+
+# Run tests with verbose output
+pytest -v tests/
+
+# Run tests for counter module only
+pytest tests/test_counter.py -v --cov=src.counter
 ```
 
 ### Code Quality
