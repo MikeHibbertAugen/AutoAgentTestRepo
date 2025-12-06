@@ -1,8 +1,8 @@
 """
-Counter package for basic counter functionality with maximum value constraint.
+Counter package for basic counter functionality with configurable boundaries.
 
-This package provides a Counter class that starts at 1 and can be incremented
-up to a maximum value of 10.
+This package provides a Counter class that can be configured with custom
+start and end values, supporting increment, reset, and boundary checking.
 """
 
 from src.counter import Counter

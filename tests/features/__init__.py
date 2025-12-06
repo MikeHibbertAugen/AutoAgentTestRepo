@@ -1,0 +1,1 @@
+"""Tests features package initialization."""
