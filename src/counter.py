@@ -4,6 +4,8 @@ This module provides a Counter class that maintains an integer value with config
 start and end boundaries, supporting increment, reset, and boundary checking operations.
 """
 
+from typing import List
+
 
 class Counter:
     """A counter with configurable start and end values.
@@ -96,3 +98,69 @@ class Counter:
             True
         """
         return self.current == self.end
+
+    def get_all_values(self) -> List[int]:
+        """Get all values from start to end as a list.
+
+        Returns:
+            List[int]: A list containing all integer values from start to end (inclusive).
+
+        Example:
+            >>> counter = Counter(start=1, end=5)
+            >>> counter.get_all_values()
+            [1, 2, 3, 4, 5]
+        """
+        return list(range(self.start, self.end + 1))
+
+    def get_current_value(self) -> int:
+        """Get the current counter value.
+
+        Returns:
+            int: The current value of the counter.
+
+        Example:
+            >>> counter = Counter(start=1, end=10)
+            >>> counter.get_current_value()
+            1
+            >>> counter.increment()
+            >>> counter.get_current_value()
+            2
+        """
+        return self.current
+
+    def display_current(self) -> None:
+        """Print the current counter value to stdout.
+
+        Example:
+            >>> counter = Counter(start=1, end=10)
+            >>> counter.current = 5
+            >>> counter.display_current()
+            5
+        """
+        print(self.current)
+
+    def print_all(self) -> None:
+        """Print all counter values from start to end, each on a separate line.
+
+        Example:
+            >>> counter = Counter(start=1, end=3)
+            >>> counter.print_all()
+            1
+            2
+            3
+        """
+        for value in self.get_all_values():
+            print(value)
+
+    def to_string(self) -> str:
+        """Format all counter values as a comma-separated string.
+
+        Returns:
+            str: A string containing all values from start to end, separated by ", ".
+
+        Example:
+            >>> counter = Counter(start=1, end=5)
+            >>> counter.to_string()
+            '1, 2, 3, 4, 5'
+        """
+        return ", ".join(str(value) for value in self.get_all_values())

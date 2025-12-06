@@ -54,7 +54,7 @@ print(counter.current)  # Output: 6
 
 ## Counter
 
-A configurable counter implementation with customizable start and end values, supporting initialization, increment, reset, and boundary checking.
+A configurable counter implementation with customizable start and end values, supporting initialization, increment, reset, boundary checking, and display/output functionality.
 
 **Usage:**
 
@@ -99,6 +99,33 @@ counter = Counter(start=-5, end=5)
 print(counter.current)  # Output: -5
 ```
 
+**Display and Output Features:**
+
+```python
+from src.counter import Counter
+
+# Get all counter values as a list
+counter = Counter(start=1, end=10)
+all_values = counter.get_all_values()
+print(all_values)  # Output: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+
+# Display current value
+counter.display_current()  # Prints: 1
+
+# Print all values sequentially
+counter.print_all()
+# Output:
+# 1
+# 2
+# 3
+# ...
+# 10
+
+# Get values as formatted string
+formatted = counter.to_string()
+print(formatted)  # Output: "1, 2, 3, 4, 5, 6, 7, 8, 9, 10"
+```
+
 **Features:**
 - Configurable start and end values
 - Default range from 1 to 10
@@ -106,6 +133,10 @@ print(counter.current)  # Output: -5
 - Reset functionality to return to start value
 - Check if counter has reached end value
 - Raises `ValueError` when attempting to increment beyond end
+- **Display and output methods for flexible value retrieval**
+- **Get all values as a list**
+- **Print current or all values to stdout**
+- **Format values as comma-separated strings**
 - Type-safe with full type hints
 - 100% test coverage
 - Clear and simple API
@@ -116,8 +147,13 @@ print(counter.current)  # Output: -5
 - `reset() -> None` - Reset counter to start value
 - `has_reached_end() -> bool` - Check if counter is at end value
 - `current: int` - Public attribute for current counter value
+- `get_all_values() -> list[int]` - Return list of all counter values from start to end
+- `get_current_value() -> int` - Return the current counter value
+- `display_current() -> None` - Print the current value to stdout
+- `print_all() -> None` - Print each counter value on a separate line
+- `to_string() -> str` - Return counter values as a comma-separated string
 
-For detailed documentation, see [Counter API Documentation](docs/counter_api.md)
+For detailed documentation, see [Counter API Documentation](docs/counter_api.md) and [Counter Display Documentation](docs/counter_display.md)
 
 ## String Operations
 
@@ -255,6 +291,7 @@ This service integrates with the free WorldTimeAPI service:
 
 For detailed API documentation, see:
 - [Counter API Documentation](docs/counter_api.md)
+- [Counter Display Documentation](docs/counter_display.md)
 - [String Utils Documentation](docs/string_utils.md)
 - [API Integration Documentation](docs/api_integration.md)
 
@@ -322,7 +359,8 @@ AutoAgentTestRepo/
 │   ├── api_reference.md
 │   ├── string_utils.md
 │   ├── api_integration.md
-│   └── counter_api.md
+│   ├── counter_api.md
+│   └── counter_display.md
 ├── .gitignore
 ├── .mypy.ini
 ├── pyproject.toml
@@ -350,6 +388,7 @@ See `requirements-dev.txt` for specific versions.
 For detailed API documentation, see:
 - [API Reference](docs/api_reference.md)
 - [Counter API Documentation](docs/counter_api.md)
+- [Counter Display Documentation](docs/counter_display.md)
 - [String Utils Documentation](docs/string_utils.md)
 - [API Integration Documentation](docs/api_integration.md)
 
