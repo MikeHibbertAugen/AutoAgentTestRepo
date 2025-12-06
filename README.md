@@ -1,10 +1,10 @@
 # AutoAgentTestRepo
 
-This is a test repository for string manipulation utilities, timezone services, a configurable counter implementation, and a text-based adventure game world location system.
+This is a test repository for string manipulation utilities, timezone services, a configurable counter implementation, and a text-based adventure game world location system with rich location description display.
 
 ## Features
 
-This package provides string manipulation utilities, timezone services, a counter class, and a location-based game world system with a focus on type safety, comprehensive testing, and clean code practices.
+This package provides string manipulation utilities, timezone services, a counter class, and a location-based game world system with immersive location descriptions, featuring type safety, comprehensive testing, and clean code practices.
 
 ### Installation
 
@@ -28,6 +28,9 @@ from src.nelson_time import get_current_time
 from src.counter import Counter
 from src.location import Location
 from src.world_initializer import initialize_world
+from src.location_display import LocationDisplay
+from src.player import Player
+from src.game_controller import GameController
 
 # Reverse a string
 result = reverse_string("hello")
@@ -53,31 +56,300 @@ print(counter.current)  # Output: 5
 counter.increment()
 print(counter.current)  # Output: 6
 
-# Create game locations
-beach = Location("Muriwai Beach", "A beautiful black sand beach on the west coast")
-forest = Location("Waitakere Ranges", "Dense native forest with walking trails")
+# Create game locations with exits
+beach = Location("Muriwai Beach", "A beautiful black sand beach on the west coast", 
+                 {"east": "Waitakere Ranges"})
+forest = Location("Waitakere Ranges", "Dense native forest with walking trails",
+                  {"west": "Muriwai Beach"})
 
-# Connect locations
-beach.add_exit("east", forest)
-forest.add_exit("west", beach)
+# Display location information
+display = LocationDisplay()
+location_info = display.format_location_info(beach)
+print(location_info)
+# Output:
+# === Muriwai Beach ===
+# A beautiful black sand beach on the west coast
+# Exits: east
 
-# Navigate between locations
-print(beach.name)  # Output: Muriwai Beach
-print(beach.get_available_exits())  # Output: ['east']
-next_location = beach.get_exit("east")
-print(next_location.name)  # Output: Waitakere Ranges
+# Initialize a complete game with player and locations
+locations = {
+    "Town Square": Location("Town Square", "A bustling central plaza", 
+                           {"north": "Castle", "south": "Market"}),
+    "Castle": Location("Castle", "An imposing stone fortress",
+                      {"south": "Town Square"}),
+    "Market": Location("Market", "A vibrant marketplace",
+                      {"north": "Town Square"})
+}
+starting_location = locations["Town Square"]
+player = Player(starting_location)
+game = GameController(player, locations)
 
-# Initialize the complete Auckland game world
-world = initialize_world()
-starting_location = world.starting_location
-print(f"Starting at: {starting_location.name}")  # Output: Starting at: Helensville
-print(f"Description: {starting_location.description}")
+# Look around current location
+print(game.look_around())
+# Output:
+# === Town Square ===
+# A bustling central plaza
+# Exits: north, south
 
-# Navigate through the world
-if starting_location.has_exit("north"):
-    next_loc = starting_location.get_exit("north")
-    print(f"Traveling north to: {next_loc.name}")
+# Move to a new location (automatically displays new location)
+print(game.handle_move_command("Castle"))
+# Output:
+# === Castle ===
+# An imposing stone fortress
+# Exits: south
 ```
+
+## Location Description System
+
+A comprehensive location description system for text-based adventure games that displays immersive location information including names, descriptions, and available exits. The system automatically displays location information when players arrive and when they explicitly look around.
+
+### Core Components
+
+#### Location Class
+
+The `Location` class represents individual game locations with names, descriptions, and directional exits.
+
+**Usage:**
+
+```python
+from src.location import Location
+
+# Create a location with exits
+tavern = Location(
+    name="The Prancing Pony",
+    description="A cozy tavern with a roaring fireplace",
+    exits={"north": "Town Square", "east": "Stables"}
+)
+
+# Create a location without exits (dead end)
+treasure_room = Location(
+    name="Treasure Room",
+    description="A hidden chamber filled with gold and jewels"
+)
+
+# Access location properties
+print(tavern.name)  # Output: The Prancing Pony
+print(tavern.description)  # Output: A cozy tavern with a roaring fireplace
+
+# Get available exit directions
+exits = tavern.get_exits()
+print(exits)  # Output: ['north', 'east']
+
+# Check if location has any exits
+print(tavern.has_exits())  # Output: True
+print(treasure_room.has_exits())  # Output: False
+
+# Get destination for a specific direction
+destination = tavern.get_exit_destination("north")
+print(destination)  # Output: Town Square
+```
+
+#### LocationDisplay Class
+
+The `LocationDisplay` class handles formatting and displaying location information in a consistent, immersive format.
+
+**Usage:**
+
+```python
+from src.location import Location
+from src.location_display import LocationDisplay
+
+display = LocationDisplay()
+
+# Create a location
+forest = Location(
+    name="Enchanted Forest",
+    description="Ancient trees tower above you, their branches forming a canopy",
+    exits={"north": "Clearing", "south": "River", "west": "Cave"}
+)
+
+# Format complete location information
+info = display.format_location_info(forest)
+print(info)
+# Output:
+# === Enchanted Forest ===
+# Ancient trees tower above you, their branches forming a canopy
+# Exits: north, south, west
+
+# Format individual components
+name = display.format_name(forest)
+description = display.format_description(forest)
+exits = display.format_exits(forest)
+
+# Handle location with no exits
+dead_end = Location("Dead End", "A solid stone wall blocks your path")
+info = display.format_location_info(dead_end)
+print(info)
+# Output:
+# === Dead End ===
+# A solid stone wall blocks your path
+# There are no obvious exits.
+```
+
+#### Player Class
+
+The `Player` class tracks the player's current location in the game world.
+
+**Usage:**
+
+```python
+from src.location import Location
+from src.player import Player
+
+# Create starting location
+starting_loc = Location("Village", "A peaceful village", {"north": "Forest"})
+
+# Initialize player
+player = Player(starting_loc)
+
+# Get current location
+current = player.get_current_location()
+print(current.name)  # Output: Village
+
+# Move to a new location
+forest = Location("Forest", "Dense woodland", {"south": "Village"})
+player.move_to(forest)
+print(player.get_current_location().name)  # Output: Forest
+```
+
+#### GameController Class
+
+The `GameController` class orchestrates the game, handling player commands and coordinating location display.
+
+**Usage:**
+
+```python
+from src.location import Location
+from src.player import Player
+from src.game_controller import GameController
+
+# Set up game world
+locations = {
+    "Entrance": Location("Castle Entrance", "Grand gates of the castle",
+                        {"north": "Hall", "south": "Courtyard"}),
+    "Hall": Location("Great Hall", "A magnificent hall with high ceilings",
+                    {"south": "Entrance"}),
+    "Courtyard": Location("Courtyard", "An open courtyard",
+                         {"north": "Entrance"})
+}
+
+# Initialize player and game
+player = Player(locations["Entrance"])
+game = GameController(player, locations)
+
+# Look around current location
+print(game.handle_look_command())
+# Output:
+# === Castle Entrance ===
+# Grand gates of the castle
+# Exits: north, south
+
+# Move to a new location (automatically shows new location)
+print(game.handle_move_command("Hall"))
+# Output:
+# === Great Hall ===
+# A magnificent hall with high ceilings
+# Exits: south
+
+# Look around again in current location
+print(game.look_around())
+# Output:
+# === Great Hall ===
+# A magnificent hall with high ceilings
+# Exits: south
+```
+
+### Complete Example: Building a Mini Adventure
+
+```python
+from src.location import Location
+from src.player import Player
+from src.game_controller import GameController
+
+# Create a small game world
+locations = {
+    "Forest Entrance": Location(
+        "Forest Entrance",
+        "You stand at the edge of a dark forest",
+        {"north": "Deep Forest", "east": "Meadow"}
+    ),
+    "Deep Forest": Location(
+        "Deep Forest",
+        "The trees grow thick here, blocking out the sunlight",
+        {"south": "Forest Entrance", "west": "Hidden Grove"}
+    ),
+    "Meadow": Location(
+        "Sunny Meadow",
+        "A bright meadow filled with wildflowers",
+        {"west": "Forest Entrance"}
+    ),
+    "Hidden Grove": Location(
+        "Hidden Grove",
+        "A secret grove with a crystal-clear spring",
+        {"east": "Deep Forest"}
+    )
+}
+
+# Start the game
+player = Player(locations["Forest Entrance"])
+game = GameController(player, locations)
+
+# Play through the game
+print("=== Welcome to the Forest Adventure ===\n")
+
+# Look around starting location
+print(game.look_around())
+print()
+
+# Explore north
+print("You venture north into the forest...")
+print(game.handle_move_command("Deep Forest"))
+print()
+
+# Continue exploring west
+print("You notice a path to the west...")
+print(game.handle_move_command("Hidden Grove"))
+print()
+
+# Look around the grove
+print("You examine your surroundings more carefully...")
+print(game.look_around())
+```
+
+### Features
+
+- **Automatic Location Display**: Location information is automatically shown when player arrives at a new location
+- **Explicit Look Command**: Players can look around their current location at any time
+- **Formatted Output**: Clean, consistent formatting with location names, descriptions, and exit lists
+- **No Exit Handling**: Special message displayed for locations with no available exits (dead ends)
+- **Type-Safe**: Full type hints throughout the codebase
+- **Comprehensive Testing**: 100% test coverage with unit and BDD tests
+- **Easy Integration**: Simple API for building text adventure games
+
+### API Reference
+
+**Location Class:**
+- `__init__(name: str, description: str, exits: dict[str, str] = None)` - Create a location
+- `get_exits() -> list[str]` - Get list of available exit directions
+- `has_exits() -> bool` - Check if location has any exits
+- `get_exit_destination(direction: str) -> str | None` - Get destination name for direction
+
+**LocationDisplay Class:**
+- `format_location_info(location: Location) -> str` - Format complete location information
+- `format_name(location: Location) -> str` - Format location name
+- `format_description(location: Location) -> str` - Format description
+- `format_exits(location: Location) -> str` - Format exits list or no exit message
+
+**Player Class:**
+- `__init__(starting_location: Location)` - Initialize player at starting location
+- `get_current_location() -> Location` - Get current location
+- `move_to(location: Location) -> None` - Move to new location
+
+**GameController Class:**
+- `__init__(player: Player, locations: dict[str, Location])` - Initialize game
+- `handle_look_command() -> str` - Handle look command, return location info
+- `handle_move_command(destination_name: str) -> str` - Handle movement, return new location info
+- `look_around() -> str` - Alias for looking around current location
 
 ## Game World System
 
@@ -588,9 +860,19 @@ pytest tests/test_counter_cli.py -v
 pytest tests/test_location.py -v
 pytest tests/test_game_world.py -v
 pytest tests/test_world_initializer.py -v
+pytest tests/test_location_display.py -v
+pytest tests/test_player.py -v
+pytest tests/test_game_controller.py -v
+pytest tests/test_bdd_location_description.py -v
 
 # Run BDD tests with behave
 behave tests/features/
+
+# Run location description system tests
+pytest tests/test_location_display.py -v --cov=src/location_display
+pytest tests/test_player.py -v --cov=src/player
+pytest tests/test_game_controller.py -v --cov=src/game_controller
+pytest tests/test_bdd_location_description.py -v
 
 # Run location-specific tests
 pytest tests/test_location.py -v --cov=src/location
@@ -634,6 +916,9 @@ AutoAgentTestRepo/
 │   ├── counter.py
 │   ├── counter_cli.py
 │   ├── location.py
+│   ├── location_display.py
+│   ├── player.py
+│   ├── game_controller.py
 │   ├── game_world.py
 │   └── world_initializer.py
 ├── tests/
@@ -643,6 +928,10 @@ AutoAgentTestRepo/
 │   ├── test_counter.py
 │   ├── test_counter_cli.py
 │   ├── test_location.py
+│   ├── test_location_display.py
+│   ├── test_player.py
+│   ├── test_game_controller.py
+│   ├── test_bdd_location_description.py
 │   ├── test_game_world.py
 │   ├── test_world_initializer.py
 │   └── features/
