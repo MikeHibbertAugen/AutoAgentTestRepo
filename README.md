@@ -1,10 +1,10 @@
 # AutoAgentTestRepo
 
-This is a test repository for string manipulation utilities and timezone services.
+This is a test repository for string manipulation utilities, timezone services, and a basic counter implementation.
 
 ## Features
 
-This package provides string manipulation utilities and timezone services with a focus on type safety, comprehensive testing, and clean code practices.
+This package provides string manipulation utilities, timezone services, and a counter class with a focus on type safety, comprehensive testing, and clean code practices.
 
 ### Installation
 
@@ -25,6 +25,7 @@ pip install -e .
 ```python
 from src.string_utils import reverse_string, capitalize_string
 from src.nelson_time import get_current_time
+from src.counter import Counter
 
 # Reverse a string
 result = reverse_string("hello")
@@ -37,7 +38,60 @@ print(result)  # Output: "Hello world"
 # Get current time in Nelson, New Zealand
 nelson_time = get_current_time()
 print(nelson_time)  # Output: Current date and time in Nelson
+
+# Use the counter
+counter = Counter()
+print(counter.get_value())  # Output: 1
+counter.increment()
+print(counter.get_value())  # Output: 2
 ```
+
+## Counter
+
+A basic counter implementation that starts at 1 and has a maximum value constraint of 10.
+
+**Usage:**
+
+```python
+from src.counter import Counter
+
+# Initialize counter (starts at 1)
+counter = Counter()
+print(counter.get_value())  # Output: 1
+
+# Increment the counter
+success = counter.increment()
+print(counter.get_value())  # Output: 2
+print(success)  # Output: True
+
+# Increment multiple times
+for _ in range(5):
+    counter.increment()
+print(counter.get_value())  # Output: 7
+
+# Try to exceed maximum value
+counter = Counter()
+for _ in range(10):
+    result = counter.increment()
+print(counter.get_value())  # Output: 10
+print(result)  # Output: False (cannot increment beyond 10)
+```
+
+**Features:**
+- Starts at value 1 by default
+- Maximum value constraint of 10
+- Returns `False` when attempting to increment beyond maximum
+- Type-safe with full type hints
+- 100% test coverage
+- Clear and simple API
+
+**API:**
+- `__init__()` - Initialize counter at value 1
+- `increment() -> bool` - Increment counter by 1, returns `False` if at maximum value
+- `get_value() -> int` - Get current counter value
+- `MAX_VALUE` - Class constant for maximum value (10)
+
+For detailed documentation, see [Counter Documentation](docs/counter.md)
 
 ## String Operations
 
@@ -174,6 +228,7 @@ This service integrates with the free WorldTimeAPI service:
 - See [API Integration Documentation](docs/api_integration.md) for details
 
 For detailed API documentation, see:
+- [Counter Documentation](docs/counter.md)
 - [String Utils Documentation](docs/string_utils.md)
 - [API Integration Documentation](docs/api_integration.md)
 
@@ -191,6 +246,7 @@ pytest tests/ -v --cov=src --cov-report=html
 # Run specific test file
 pytest tests/test_string_utils.py -v
 pytest tests/test_nelson_time.py -v
+pytest tests/test_counter.py -v
 ```
 
 ### Code Quality
@@ -216,15 +272,18 @@ AutoAgentTestRepo/
 ├── src/
 │   ├── __init__.py
 │   ├── string_utils.py
-│   └── nelson_time.py
+│   ├── nelson_time.py
+│   └── counter.py
 ├── tests/
 │   ├── __init__.py
 │   ├── test_string_utils.py
-│   └── test_nelson_time.py
+│   ├── test_nelson_time.py
+│   └── test_counter.py
 ├── docs/
 │   ├── api_reference.md
 │   ├── string_utils.md
-│   └── api_integration.md
+│   ├── api_integration.md
+│   └── counter.md
 ├── .gitignore
 ├── .mypy.ini
 ├── pyproject.toml
@@ -250,6 +309,7 @@ See `requirements-dev.txt` for specific versions.
 
 For detailed API documentation, see:
 - [API Reference](docs/api_reference.md)
+- [Counter Documentation](docs/counter.md)
 - [String Utils Documentation](docs/string_utils.md)
 - [API Integration Documentation](docs/api_integration.md)
 

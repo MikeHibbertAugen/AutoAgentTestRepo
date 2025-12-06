@@ -1,11 +1,11 @@
 """
-String operations utility module.
+Counter package initialization.
 
-This module provides utility functions for common string manipulation tasks.
+This package provides a Counter class with maximum value constraint.
 """
 
-from .string_operations import reverse_string
+from .counter import Counter
 
-__all__ = ['reverse_string']
+__all__ = ['Counter']
 
-__version__ = '1.0.0'
+__version__ = '0.1.0'
