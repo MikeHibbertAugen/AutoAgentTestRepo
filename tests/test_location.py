@@ -147,6 +147,40 @@ class TestExitRetrieval:
         assert simple_location.get_exit("NORTH") is None
 
 
+class TestExitExistence:
+    """Test suite for checking exit existence."""
+    
+    def test_has_exit_true(self, simple_location):
+        """Test has_exit returns True for existing exit."""
+        destination = Location("Destination")
+        simple_location.add_exit("north", destination)
+        
+        assert simple_location.has_exit("north") is True
+    
+    def test_has_exit_false(self, simple_location):
+        """Test has_exit returns False for non-existent exit."""
+        assert simple_location.has_exit("north") is False
+        assert simple_location.has_exit("invalid") is False
+    
+    def test_has_exit_multiple_exits(self, connected_locations):
+        """Test has_exit with multiple exits."""
+        entrance = connected_locations["entrance"]
+        
+        assert entrance.has_exit("north") is True
+        assert entrance.has_exit("west") is True
+        assert entrance.has_exit("south") is False
+        assert entrance.has_exit("east") is False
+    
+    def test_has_exit_case_sensitive(self, simple_location):
+        """Test that has_exit is case-sensitive."""
+        destination = Location("Destination")
+        simple_location.add_exit("north", destination)
+        
+        assert simple_location.has_exit("north") is True
+        assert simple_location.has_exit("North") is False
+        assert simple_location.has_exit("NORTH") is False
+
+
 class TestAvailableExits:
     """Test suite for querying available exits."""
     
@@ -218,3 +252,37 @@ class TestLocationConnectivity:
         """Test that a location can have an exit leading to itself."""
         simple_location.add_exit("loop", simple_location)
         assert simple_location.get_exit("loop") == simple_location
+
+
+class TestExitsDictionary:
+    """Test suite for verifying exits dictionary is properly maintained."""
+    
+    def test_exits_dictionary_empty_initially(self, simple_location):
+        """Test that exits dictionary is empty when no exits added."""
+        exits = simple_location.get_available_exits()
+        assert len(exits) == 0
+    
+    def test_exits_dictionary_updated_on_add(self, simple_location):
+        """Test that exits dictionary is updated when exits are added."""
+        dest1 = Location("Dest1")
+        dest2 = Location("Dest2")
+        
+        simple_location.add_exit("north", dest1)
+        assert len(simple_location.get_available_exits()) == 1
+        
+        simple_location.add_exit("south", dest2)
+        assert len(simple_location.get_available_exits()) == 2
+    
+    def test_exits_dictionary_maintains_references(self, simple_location):
+        """Test that exits dictionary maintains correct location references."""
+        destinations = {
+            "north": Location("North Room"),
+            "south": Location("South Room"),
+            "east": Location("East Room")
+        }
+        
+        for direction, dest in destinations.items():
+            simple_location.add_exit(direction, dest)
+        
+        for direction, dest in destinations.items():
+            assert simple_location.get_exit(direction) == dest

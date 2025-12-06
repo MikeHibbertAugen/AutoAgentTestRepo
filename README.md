@@ -27,6 +27,7 @@ from src.string_utils import reverse_string, capitalize_string
 from src.nelson_time import get_current_time
 from src.counter import Counter
 from src.location import Location
+from src.world_initializer import initialize_world
 
 # Reverse a string
 result = reverse_string("hello")
@@ -65,11 +66,26 @@ print(beach.name)  # Output: Muriwai Beach
 print(beach.get_available_exits())  # Output: ['east']
 next_location = beach.get_exit("east")
 print(next_location.name)  # Output: Waitakere Ranges
+
+# Initialize the complete Auckland game world
+world = initialize_world()
+starting_location = world.starting_location
+print(f"Starting at: {starting_location.name}")  # Output: Starting at: Helensville
+print(f"Description: {starting_location.description}")
+
+# Navigate through the world
+if starting_location.has_exit("north"):
+    next_loc = starting_location.get_exit("north")
+    print(f"Traveling north to: {next_loc.name}")
 ```
 
-## Game World Location System
+## Game World System
 
-A text-based adventure game location system set in north-west Auckland, featuring interconnected locations that players can navigate through.
+A text-based adventure game world system set in north-west Auckland, featuring interconnected locations that players can navigate through. The system provides a complete game world initialization with specific Auckland locations and bidirectional navigation.
+
+### Location System
+
+The `Location` class represents individual game locations with directional exits.
 
 **Usage:**
 
@@ -101,53 +117,175 @@ if next_location:
 # Check for invalid exits
 unknown = beach.get_exit("west")
 print(unknown)  # Output: None
+
+# Check if an exit exists
+print(beach.has_exit("east"))  # Output: True
+print(beach.has_exit("west"))  # Output: False
 ```
 
+**Location API:**
+- `__init__(name: str, description: str = "")` - Create a location with name and optional description
+- `add_exit(direction: str, destination: Location) -> None` - Add an exit in a specific direction
+- `get_exit(direction: str) -> Optional[Location]` - Get the destination location for a direction
+- `has_exit(direction: str) -> bool` - Check if an exit exists in a specific direction
+- `get_available_exits() -> List[str]` - Get list of all available exit directions
+- `name: str` - Property to access location name
+- `description: str` - Property to access location description
+
+### Game World Manager
+
+The `GameWorld` class manages the collection of locations and their connections.
+
+**Usage:**
+
+```python
+from src.game_world import GameWorld
+from src.location import Location
+
+# Create a game world
+world = GameWorld()
+
+# Create locations
+helensville = Location("Helensville", "A rural town in north-west Auckland")
+parakai = Location("Parakai", "Home to natural hot springs")
+kumeu = Location("Kumeu", "Wine country with numerous vineyards")
+
+# Add locations to the world
+world.add_location(helensville)
+world.add_location(parakai)
+world.add_location(kumeu)
+
+# Set starting location
+world.set_starting_location(helensville)
+
+# Connect locations bidirectionally
+world.connect_locations("Helensville", "north", "Parakai")
+# This creates both: Helensville -> north -> Parakai AND Parakai -> south -> Helensville
+
+# Check if locations exist
+print(world.has_location("Helensville"))  # Output: True
+print(world.has_location("Wellington"))  # Output: False
+
+# Retrieve locations by name
+location = world.get_location("Kumeu")
+print(location.name)  # Output: Kumeu
+
+# Access starting location
+print(world.starting_location.name)  # Output: Helensville
+```
+
+**GameWorld API:**
+- `__init__()` - Create an empty game world
+- `add_location(location: Location) -> None` - Add a location to the world
+- `get_location(name: str) -> Optional[Location]` - Retrieve a location by name
+- `has_location(name: str) -> bool` - Check if a location exists in the world
+- `set_starting_location(location: Location) -> None` - Set the starting location for the game
+- `connect_locations(loc1_name: str, direction: str, loc2_name: str) -> None` - Create bidirectional connection between locations
+- `starting_location: Optional[Location]` - Property to access the starting location
+
+### World Initializer
+
+The `initialize_world()` function creates a complete game world for north-west Auckland with all locations and connections pre-configured.
+
+**Usage:**
+
+```python
+from src.world_initializer import initialize_world
+
+# Initialize the complete Auckland game world
+world = initialize_world()
+
+# Start at the default location (Helensville)
+current_location = world.starting_location
+print(f"You are at: {current_location.name}")
+print(f"Description: {current_location.description}")
+
+# Explore available exits
+exits = current_location.get_available_exits()
+print(f"You can go: {', '.join(exits)}")
+
+# Navigate to Parakai
+if current_location.has_exit("north"):
+    current_location = current_location.get_exit("north")
+    print(f"Traveled north to: {current_location.name}")
+
+# Navigate back to Helensville
+if current_location.has_exit("south"):
+    current_location = current_location.get_exit("south")
+    print(f"Traveled south to: {current_location.name}")
+
+# Access specific locations
+kumeu = world.get_location("Kumeu")
+huapai = world.get_location("Huapai")
+print(f"{kumeu.name} is connected to {huapai.name}")
+```
+
+**Auckland Locations:**
+
+The game world includes the following north-west Auckland locations:
+- **Helensville** - Starting location, a rural town in north-west Auckland
+- **Parakai** - Home to natural hot springs
+- **Kumeu** - Wine country with numerous vineyards
+- **Huapai** - A charming village near Kumeu
+- **Riverhead** - Historic village at the head of the Waitemata Harbour
+- **Coatesville** - Semi-rural area with lifestyle blocks
+- **Muriwai Beach** - Black sand beach with dramatic gannet colony
+
+**Location Connections:**
+
+The following bidirectional connections are established:
+- Helensville ↔ Parakai (north/south)
+- Kumeu ↔ Huapai (north/south)
+- Riverhead ↔ Coatesville (east/west)
+
 **Features:**
-- Location creation with name and optional description
-- Directional exits connecting locations (north, south, east, west, etc.)
-- Query available exits from any location
-- Navigate between connected locations
+- Pre-configured Auckland locations with descriptions
+- Bidirectional navigation (if A connects to B, then B connects to A)
+- Helensville set as the starting location
 - Type-safe with full type hints
 - Comprehensive error handling
 - 100% test coverage
 - BDD scenarios for behavior validation
 
-**API:**
-- `__init__(name: str, description: str = "")` - Create a location with name and optional description
-- `add_exit(direction: str, destination: Location) -> None` - Add an exit in a specific direction
-- `get_exit(direction: str) -> Optional[Location]` - Get the destination location for a direction
-- `get_available_exits() -> List[str]` - Get list of all available exit directions
-- `name: str` - Property to access location name
-- `description: str` - Property to access location description
-
-**Example Game World:**
+**Example Game World Exploration:**
 
 ```python
-from src.location import Location
+from src.world_initializer import initialize_world
 
-# Create a connected world in north-west Auckland
-muriwai = Location("Muriwai Beach", "Black sand beach with dramatic gannet colony")
-piha = Location("Piha Beach", "Famous surf beach with Lion Rock")
-karekare = Location("Karekare Beach", "Secluded beach surrounded by cliffs")
-ranges = Location("Waitakere Ranges", "Ancient rainforest with native birds")
-arataki = Location("Arataki Visitor Centre", "Information center with panoramic views")
+# Initialize world
+world = initialize_world()
 
-# Connect the locations
-muriwai.add_exit("south", ranges)
-ranges.add_exit("north", muriwai)
-ranges.add_exit("west", piha)
-ranges.add_exit("south", arataki)
-piha.add_exit("east", ranges)
-piha.add_exit("south", karekare)
-karekare.add_exit("north", piha)
-arataki.add_exit("north", ranges)
-
-# Explore the world
-current = muriwai
+# Start the game
+current = world.starting_location
+print(f"=== Welcome to North-West Auckland Adventure ===")
 print(f"You are at: {current.name}")
-print(f"Description: {current.description}")
+print(f"{current.description}")
+print()
+
+# Explore Parakai
 print(f"Available exits: {', '.join(current.get_available_exits())}")
+current = current.get_exit("north")
+print(f"\nYou travel north to: {current.name}")
+print(f"{current.description}")
+
+# Return to Helensville
+current = current.get_exit("south")
+print(f"\nYou travel south back to: {current.name}")
+
+# Explore Kumeu and Huapai
+kumeu = world.get_location("Kumeu")
+print(f"\n--- Exploring wine country ---")
+print(f"You are at: {kumeu.name}")
+print(f"{kumeu.description}")
+print(f"Available exits: {', '.join(kumeu.get_available_exits())}")
+
+huapai = kumeu.get_exit("north")
+print(f"\nYou travel north to: {huapai.name}")
+print(f"{huapai.description}")
+
+# Verify bidirectional connection
+back_to_kumeu = huapai.get_exit("south")
+print(f"\nYou can return south to: {back_to_kumeu.name}")
 ```
 
 For detailed documentation, see [Location Architecture Documentation](docs/architecture.md)
@@ -448,6 +586,8 @@ pytest tests/test_nelson_time.py -v
 pytest tests/test_counter.py -v
 pytest tests/test_counter_cli.py -v
 pytest tests/test_location.py -v
+pytest tests/test_game_world.py -v
+pytest tests/test_world_initializer.py -v
 
 # Run BDD tests with behave
 behave tests/features/
@@ -455,6 +595,10 @@ behave tests/features/
 # Run location-specific tests
 pytest tests/test_location.py -v --cov=src/location
 behave tests/features/location.feature
+
+# Run game world tests
+pytest tests/test_game_world.py -v --cov=src/game_world
+pytest tests/test_world_initializer.py -v --cov=src/world_initializer
 
 # Generate HTML coverage report
 pytest tests/ -v --cov=src --cov-report=html
@@ -489,7 +633,9 @@ AutoAgentTestRepo/
 │   ├── nelson_time.py
 │   ├── counter.py
 │   ├── counter_cli.py
-│   └── location.py
+│   ├── location.py
+│   ├── game_world.py
+│   └── world_initializer.py
 ├── tests/
 │   ├── __init__.py
 │   ├── test_string_utils.py
@@ -497,6 +643,8 @@ AutoAgentTestRepo/
 │   ├── test_counter.py
 │   ├── test_counter_cli.py
 │   ├── test_location.py
+│   ├── test_game_world.py
+│   ├── test_world_initializer.py
 │   └── features/
 │       ├── __init__.py
 │       ├── counter.feature
