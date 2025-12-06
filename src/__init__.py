@@ -1,12 +1,11 @@
 """
-Nelson Time package for fetching current date and time in Nelson, New Zealand.
+Counter package for basic counter functionality with maximum value constraint.
 
-This package provides utilities to fetch the current time in Nelson (New Zealand)
-using the WorldTimeAPI service. Nelson uses the Pacific/Auckland timezone.
+This package provides a Counter class that starts at 1 and can be incremented
+up to a maximum value of 10.
 """
 
-from src.nelson_time import get_current_time
-from src.string_utils import reverse_string, capitalize_string
+from src.counter import Counter
 
 __version__ = "0.1.0"
-__all__ = ["get_current_time", "reverse_string", "capitalize_string"]
+__all__ = ["Counter"]
