@@ -8,6 +8,9 @@ version = "0.1.0"
 description = "A basic counter with maximum value constraint"
 requires-python = ">=3.8"
 
+[project.scripts]
+counter = "counter_cli:main"
+
 [tool.black]
 line-length = 88
 target-version = ['py38']

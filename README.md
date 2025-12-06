@@ -126,6 +126,43 @@ formatted = counter.to_string()
 print(formatted)  # Output: "1, 2, 3, 4, 5, 6, 7, 8, 9, 10"
 ```
 
+**CLI Usage:**
+
+The counter can also be run as a command-line tool with customizable start and end parameters.
+
+Run the counter with default parameters (1 to 10):
+```bash
+python src/counter_cli.py
+```
+
+Customize the starting number:
+```bash
+python src/counter_cli.py --start 5
+```
+
+Customize the ending number:
+```bash
+python src/counter_cli.py --end 15
+```
+
+Customize both parameters:
+```bash
+python src/counter_cli.py --start 3 --end 7
+```
+
+Display help information:
+```bash
+python src/counter_cli.py --help
+```
+
+**CLI Features:**
+- Configurable start and end values via command-line arguments
+- Default range from 1 to 10
+- Comprehensive error handling for invalid inputs
+- Clear help documentation
+- User-friendly error messages
+- Proper exit codes for CI/CD integration
+
 **Features:**
 - Configurable start and end values
 - Default range from 1 to 10
@@ -137,6 +174,7 @@ print(formatted)  # Output: "1, 2, 3, 4, 5, 6, 7, 8, 9, 10"
 - **Get all values as a list**
 - **Print current or all values to stdout**
 - **Format values as comma-separated strings**
+- **Command-line interface for standalone execution**
 - Type-safe with full type hints
 - 100% test coverage
 - Clear and simple API
@@ -307,6 +345,7 @@ pytest tests/ -v --cov=src --cov-report=term-missing
 pytest tests/test_string_utils.py -v
 pytest tests/test_nelson_time.py -v
 pytest tests/test_counter.py -v
+pytest tests/test_counter_cli.py -v
 
 # Run BDD tests with behave
 behave tests/features/
@@ -342,12 +381,14 @@ AutoAgentTestRepo/
 │   ├── __init__.py
 │   ├── string_utils.py
 │   ├── nelson_time.py
-│   └── counter.py
+│   ├── counter.py
+│   └── counter_cli.py
 ├── tests/
 │   ├── __init__.py
 │   ├── test_string_utils.py
 │   ├── test_nelson_time.py
 │   ├── test_counter.py
+│   ├── test_counter_cli.py
 │   └── features/
 │       ├── __init__.py
 │       ├── counter.feature
