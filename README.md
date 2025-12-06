@@ -41,55 +41,102 @@ print(nelson_time)  # Output: Current date and time in Nelson
 
 # Use the counter
 counter = Counter()
-print(counter.get_value())  # Output: 1
+print(counter.current)  # Output: 1
 counter.increment()
-print(counter.get_value())  # Output: 2
+print(counter.current)  # Output: 2
 ```
 
 ## Counter
 
-A basic counter implementation that starts at 1 and has a maximum value constraint of 10.
+A basic counter implementation with configurable start and end values, defaulting to counting from 1 to 10.
 
 **Usage:**
 
 ```python
 from src.counter import Counter
 
-# Initialize counter (starts at 1)
+# Initialize counter with default values (starts at 1, ends at 10)
 counter = Counter()
-print(counter.get_value())  # Output: 1
+print(counter.current)  # Output: 1
+print(counter.start)    # Output: 1
+print(counter.end)      # Output: 10
+
+# Initialize counter with custom range
+counter = Counter(start=5, end=15)
+print(counter.current)  # Output: 5
+print(counter.end)      # Output: 15
 
 # Increment the counter
-success = counter.increment()
-print(counter.get_value())  # Output: 2
-print(success)  # Output: True
+counter = Counter()
+counter.increment()
+print(counter.current)  # Output: 2
 
 # Increment multiple times
 for _ in range(5):
     counter.increment()
-print(counter.get_value())  # Output: 7
+print(counter.current)  # Output: 7
 
-# Try to exceed maximum value
+# Check if counter has reached the end
 counter = Counter()
-for _ in range(10):
-    result = counter.increment()
-print(counter.get_value())  # Output: 10
-print(result)  # Output: False (cannot increment beyond 10)
+for _ in range(9):
+    counter.increment()
+print(counter.has_reached_end())  # Output: True
+print(counter.current)             # Output: 10
+
+# Attempting to increment beyond maximum raises an exception
+try:
+    counter.increment()
+except ValueError as e:
+    print(e)  # Output: "Cannot increment: counter has reached maximum value of 10"
+
+# Reset counter to initial value
+counter = Counter()
+counter.increment()
+counter.increment()
+print(counter.current)  # Output: 3
+counter.reset()
+print(counter.current)  # Output: 1
 ```
 
 **Features:**
-- Starts at value 1 by default
-- Maximum value constraint of 10
-- Returns `False` when attempting to increment beyond maximum
+- Configurable start and end values (defaults: start=1, end=10)
+- Increment counter by 1 with boundary validation
+- Check if counter has reached its maximum value
+- Reset counter to initial value at any time
+- Raises `ValueError` when attempting to increment beyond maximum
 - Type-safe with full type hints
 - 100% test coverage
-- Clear and simple API
+- Clear and simple API with read-only properties
 
 **API:**
-- `__init__()` - Initialize counter at value 1
-- `increment() -> bool` - Increment counter by 1, returns `False` if at maximum value
-- `get_value() -> int` - Get current counter value
-- `MAX_VALUE` - Class constant for maximum value (10)
+- `__init__(start: int = 1, end: int = 10)` - Initialize counter with start and end values
+- `increment() -> None` - Increment counter by 1, raises `ValueError` if at maximum
+- `get_current() -> int` - Get current counter value
+- `reset() -> None` - Reset counter to initial start value
+- `has_reached_end() -> bool` - Check if current value equals end value
+- `start` - Read-only property for start value
+- `end` - Read-only property for end value
+- `current` - Read-only property for current value
+
+**Exception Handling:**
+
+```python
+from src.counter import Counter
+
+counter = Counter()
+for _ in range(9):
+    counter.increment()
+
+# Counter is now at maximum (10)
+try:
+    counter.increment()
+except ValueError as e:
+    print(e)  # Output: "Cannot increment: counter has reached maximum value of 10"
+
+# Reset and continue counting
+counter.reset()
+print(counter.current)  # Output: 1
+```
 
 For detailed documentation, see [Counter Documentation](docs/counter.md)
 
@@ -283,7 +330,8 @@ AutoAgentTestRepo/
 │   ├── api_reference.md
 │   ├── string_utils.md
 │   ├── api_integration.md
-│   └── counter.md
+│   ├── counter.md
+│   └── architecture.md
 ├── .gitignore
 ├── .mypy.ini
 ├── pyproject.toml
@@ -297,11 +345,11 @@ AutoAgentTestRepo/
 - `requests` - HTTP library for API calls
 
 ### Development Dependencies
-- `pytest` - Testing framework
-- `pytest-cov` - Code coverage reporting
-- `black` - Code formatting
-- `ruff` - Fast Python linter
-- `mypy` - Static type checker
+- `pytest>=7.4.0` - Testing framework
+- `pytest-cov>=4.1.0` - Code coverage reporting
+- `black>=23.0.0` - Code formatting
+- `ruff>=0.1.0` - Fast Python linter
+- `mypy>=1.5.0` - Static type checker
 
 See `requirements-dev.txt` for specific versions.
 
@@ -312,6 +360,7 @@ For detailed API documentation, see:
 - [Counter Documentation](docs/counter.md)
 - [String Utils Documentation](docs/string_utils.md)
 - [API Integration Documentation](docs/api_integration.md)
+- [Architecture Documentation](docs/architecture.md)
 
 ## Contributing
 
