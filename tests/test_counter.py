@@ -3,7 +3,8 @@ Unit tests for the Counter class.
 
 This module contains comprehensive pytest tests covering all scenarios
 for the Counter class including initialization, increment operations,
-reset functionality, boundary conditions, and edge cases.
+reset functionality, boundary conditions, edge cases, and display/output
+functionality.
 """
 
 import pytest
@@ -256,3 +257,158 @@ def test_multiple_resets() -> None:
     
     counter.reset()
     assert counter.current == 1
+
+
+# Display and Output Functionality Tests
+
+
+def test_get_all_values_as_list() -> None:
+    """
+    Scenario 1: Retrieve counter values as a list.
+    
+    Given a counter initialized from 1 to 10
+    When I call get_all_values()
+    Then I should receive a list [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    """
+    counter = Counter(start=1, end=10)
+    values = counter.get_all_values()
+    
+    assert values == [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
+    assert isinstance(values, list)
+    assert len(values) == 10
+
+
+def test_display_current_value(capsys: pytest.CaptureFixture) -> None:
+    """
+    Scenario 2: Display current counter value.
+    
+    Given a counter initialized from 1 to 10
+    And the current value is 5
+    When I call display_current()
+    Then the output should show "5"
+    """
+    counter = Counter(start=1, end=10)
+    # Increment to value 5
+    for _ in range(4):
+        counter.increment()
+    
+    assert counter.current == 5
+    
+    counter.display_current()
+    captured = capsys.readouterr()
+    
+    assert "5" in captured.out
+
+
+def test_print_all_sequentially(capsys: pytest.CaptureFixture) -> None:
+    """
+    Scenario 3: Print all counter values sequentially.
+    
+    Given a counter initialized from 1 to 10
+    When I call print_all()
+    Then each number from 1 to 10 should be printed on a separate line
+    """
+    counter = Counter(start=1, end=10)
+    counter.print_all()
+    
+    captured = capsys.readouterr()
+    lines = captured.out.strip().split('\n')
+    
+    assert len(lines) == 10
+    for i, line in enumerate(lines, start=1):
+        assert line.strip() == str(i)
+
+
+def test_get_formatted_string() -> None:
+    """
+    Scenario 4: Get counter values as formatted string.
+    
+    Given a counter initialized from 1 to 10
+    When I call to_string()
+    Then I should receive "1, 2, 3, 4, 5, 6, 7, 8, 9, 10"
+    """
+    counter = Counter(start=1, end=10)
+    result = counter.to_string()
+    
+    assert result == "1, 2, 3, 4, 5, 6, 7, 8, 9, 10"
+    assert isinstance(result, str)
+
+
+def test_get_current_value() -> None:
+    """Test get_current_value() returns the current counter value."""
+    counter = Counter(start=1, end=10)
+    
+    assert counter.get_current_value() == 1
+    
+    counter.increment()
+    counter.increment()
+    
+    assert counter.get_current_value() == 3
+
+
+def test_get_all_values_custom_range() -> None:
+    """Test get_all_values() with custom range."""
+    counter = Counter(start=5, end=10)
+    values = counter.get_all_values()
+    
+    assert values == [5, 6, 7, 8, 9, 10]
+
+
+def test_get_all_values_negative_range() -> None:
+    """Test get_all_values() with negative range."""
+    counter = Counter(start=-3, end=2)
+    values = counter.get_all_values()
+    
+    assert values == [-3, -2, -1, 0, 1, 2]
+
+
+def test_get_all_values_single_value() -> None:
+    """Test get_all_values() when start equals end."""
+    counter = Counter(start=7, end=7)
+    values = counter.get_all_values()
+    
+    assert values == [7]
+    assert len(values) == 1
+
+
+def test_to_string_single_value() -> None:
+    """Test to_string() with single value."""
+    counter = Counter(start=5, end=5)
+    result = counter.to_string()
+    
+    assert result == "5"
+
+
+def test_to_string_custom_range() -> None:
+    """Test to_string() with custom range."""
+    counter = Counter(start=100, end=105)
+    result = counter.to_string()
+    
+    assert result == "100, 101, 102, 103, 104, 105"
+
+
+def test_print_all_custom_range(capsys: pytest.CaptureFixture) -> None:
+    """Test print_all() with custom range."""
+    counter = Counter(start=3, end=6)
+    counter.print_all()
+    
+    captured = capsys.readouterr()
+    lines = captured.out.strip().split('\n')
+    
+    assert lines == ["3", "4", "5", "6"]
+
+
+def test_display_current_after_increment(capsys: pytest.CaptureFixture) -> None:
+    """Test display_current() shows updated value after increment."""
+    counter = Counter(start=1, end=10)
+    
+    counter.display_current()
+    captured1 = capsys.readouterr()
+    assert "1" in captured1.out
+    
+    counter.increment()
+    counter.increment()
+    
+    counter.display_current()
+    captured2 = capsys.readouterr()
+    assert "3" in captured2.out
