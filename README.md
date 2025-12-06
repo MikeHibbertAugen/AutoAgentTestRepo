@@ -1,10 +1,10 @@
 # AutoAgentTestRepo
 
-This is a test repository for string manipulation utilities, timezone services, and a configurable counter implementation.
+This is a test repository for string manipulation utilities, timezone services, a configurable counter implementation, and a text-based adventure game world location system.
 
 ## Features
 
-This package provides string manipulation utilities, timezone services, and a counter class with a focus on type safety, comprehensive testing, and clean code practices.
+This package provides string manipulation utilities, timezone services, a counter class, and a location-based game world system with a focus on type safety, comprehensive testing, and clean code practices.
 
 ### Installation
 
@@ -26,6 +26,7 @@ pip install -e .
 from src.string_utils import reverse_string, capitalize_string
 from src.nelson_time import get_current_time
 from src.counter import Counter
+from src.location import Location
 
 # Reverse a string
 result = reverse_string("hello")
@@ -50,7 +51,106 @@ counter = Counter(start=5, end=15)
 print(counter.current)  # Output: 5
 counter.increment()
 print(counter.current)  # Output: 6
+
+# Create game locations
+beach = Location("Muriwai Beach", "A beautiful black sand beach on the west coast")
+forest = Location("Waitakere Ranges", "Dense native forest with walking trails")
+
+# Connect locations
+beach.add_exit("east", forest)
+forest.add_exit("west", beach)
+
+# Navigate between locations
+print(beach.name)  # Output: Muriwai Beach
+print(beach.get_available_exits())  # Output: ['east']
+next_location = beach.get_exit("east")
+print(next_location.name)  # Output: Waitakere Ranges
 ```
+
+## Game World Location System
+
+A text-based adventure game location system set in north-west Auckland, featuring interconnected locations that players can navigate through.
+
+**Usage:**
+
+```python
+from src.location import Location
+
+# Create locations
+beach = Location("Muriwai Beach", "A beautiful black sand beach on the west coast")
+forest = Location("Waitakere Ranges", "Dense native forest with walking trails")
+cafe = Location("Piha Cafe")  # Description is optional
+
+# Connect locations with directional exits
+beach.add_exit("east", forest)
+beach.add_exit("north", cafe)
+forest.add_exit("west", beach)
+cafe.add_exit("south", beach)
+
+# Query location information
+print(beach.name)  # Output: Muriwai Beach
+print(beach.description)  # Output: A beautiful black sand beach on the west coast
+print(beach.get_available_exits())  # Output: ['east', 'north']
+
+# Navigate between locations
+next_location = beach.get_exit("east")
+if next_location:
+    print(f"You travel east to {next_location.name}")
+    # Output: You travel east to Waitakere Ranges
+
+# Check for invalid exits
+unknown = beach.get_exit("west")
+print(unknown)  # Output: None
+```
+
+**Features:**
+- Location creation with name and optional description
+- Directional exits connecting locations (north, south, east, west, etc.)
+- Query available exits from any location
+- Navigate between connected locations
+- Type-safe with full type hints
+- Comprehensive error handling
+- 100% test coverage
+- BDD scenarios for behavior validation
+
+**API:**
+- `__init__(name: str, description: str = "")` - Create a location with name and optional description
+- `add_exit(direction: str, destination: Location) -> None` - Add an exit in a specific direction
+- `get_exit(direction: str) -> Optional[Location]` - Get the destination location for a direction
+- `get_available_exits() -> List[str]` - Get list of all available exit directions
+- `name: str` - Property to access location name
+- `description: str` - Property to access location description
+
+**Example Game World:**
+
+```python
+from src.location import Location
+
+# Create a connected world in north-west Auckland
+muriwai = Location("Muriwai Beach", "Black sand beach with dramatic gannet colony")
+piha = Location("Piha Beach", "Famous surf beach with Lion Rock")
+karekare = Location("Karekare Beach", "Secluded beach surrounded by cliffs")
+ranges = Location("Waitakere Ranges", "Ancient rainforest with native birds")
+arataki = Location("Arataki Visitor Centre", "Information center with panoramic views")
+
+# Connect the locations
+muriwai.add_exit("south", ranges)
+ranges.add_exit("north", muriwai)
+ranges.add_exit("west", piha)
+ranges.add_exit("south", arataki)
+piha.add_exit("east", ranges)
+piha.add_exit("south", karekare)
+karekare.add_exit("north", piha)
+arataki.add_exit("north", ranges)
+
+# Explore the world
+current = muriwai
+print(f"You are at: {current.name}")
+print(f"Description: {current.description}")
+print(f"Available exits: {', '.join(current.get_available_exits())}")
+```
+
+For detailed documentation, see [Location Architecture Documentation](docs/architecture.md)
 
 ## Counter
 
@@ -332,6 +432,7 @@ For detailed API documentation, see:
 - [Counter Display Documentation](docs/counter_display.md)
 - [String Utils Documentation](docs/string_utils.md)
 - [API Integration Documentation](docs/api_integration.md)
+- [Location Architecture Documentation](docs/architecture.md)
 
 ## Development
 
@@ -346,9 +447,14 @@ pytest tests/test_string_utils.py -v
 pytest tests/test_nelson_time.py -v
 pytest tests/test_counter.py -v
 pytest tests/test_counter_cli.py -v
+pytest tests/test_location.py -v
 
 # Run BDD tests with behave
 behave tests/features/
+
+# Run location-specific tests
+pytest tests/test_location.py -v --cov=src/location
+behave tests/features/location.feature
 
 # Generate HTML coverage report
 pytest tests/ -v --cov=src --cov-report=html
@@ -382,26 +488,31 @@ AutoAgentTestRepo/
 │   ├── string_utils.py
 │   ├── nelson_time.py
 │   ├── counter.py
-│   └── counter_cli.py
+│   ├── counter_cli.py
+│   └── location.py
 ├── tests/
 │   ├── __init__.py
 │   ├── test_string_utils.py
 │   ├── test_nelson_time.py
 │   ├── test_counter.py
 │   ├── test_counter_cli.py
+│   ├── test_location.py
 │   └── features/
 │       ├── __init__.py
 │       ├── counter.feature
+│       ├── location.feature
 │       ├── environment.py
 │       └── steps/
 │           ├── __init__.py
-│           └── counter_steps.py
+│           ├── counter_steps.py
+│           └── location_steps.py
 ├── docs/
 │   ├── api_reference.md
 │   ├── string_utils.md
 │   ├── api_integration.md
 │   ├── counter_api.md
-│   └── counter_display.md
+│   ├── counter_display.md
+│   └── architecture.md
 ├── .gitignore
 ├── .mypy.ini
 ├── pyproject.toml
@@ -432,6 +543,7 @@ For detailed API documentation, see:
 - [Counter Display Documentation](docs/counter_display.md)
 - [String Utils Documentation](docs/string_utils.md)
 - [API Integration Documentation](docs/api_integration.md)
+- [Location Architecture Documentation](docs/architecture.md)
 
 ## Contributing
 

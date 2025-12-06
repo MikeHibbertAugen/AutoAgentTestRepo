@@ -1,11 +1,11 @@
 """
-Counter package for basic counter functionality with configurable boundaries.
+Location-based adventure game package for a text-based game set in north-west Auckland.
 
-This package provides a Counter class that can be configured with custom
-start and end values, supporting increment, reset, and boundary checking.
+This package provides core game world models including Location for representing
+navigable game locations with descriptions and interconnected exits.
 """
 
-from src.counter import Counter
+from src.location import Location
 
 __version__ = "0.1.0"
-__all__ = ["Counter"]
+__all__ = ["Location"]

@@ -3,22 +3,20 @@ requires = ["setuptools>=61.0"]
 build-backend = "setuptools.build_meta"
 
 [project]
-name = "counter"
+name = "adventure-game"
 version = "0.1.0"
-description = "A basic counter with maximum value constraint"
-requires-python = ">=3.8"
-
-[project.scripts]
-counter = "counter_cli:main"
+description = "A text-based adventure game set in north-west Auckland"
+requires-python = ">=3.9"
 
 [tool.black]
 line-length = 88
-target-version = ['py38']
+target-version = ['py39']
 
 [tool.ruff]
 line-length = 88
 select = ["E", "F", "W", "I", "N", "UP", "B", "A", "C4", "SIM"]
 ignore = []
+target-version = "py39"
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
@@ -40,10 +38,13 @@ exclude_lines = [
 ]
 
 [tool.mypy]
-python_version = "3.8"
+python_version = "3.9"
 warn_return_any = true
 warn_unused_configs = true
 disallow_untyped_defs = true
 disallow_incomplete_defs = true
 check_untyped_defs = true
 no_implicit_optional = true
+strict = true
+warn_redundant_casts = true
+warn_unused_ignores = true
