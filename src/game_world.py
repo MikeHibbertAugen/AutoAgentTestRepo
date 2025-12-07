@@ -5,6 +5,7 @@ and their connections within the game world.
 """
 
 from typing import Dict, Optional
+from collections import deque
 from src.location import Location
 
 
@@ -16,6 +17,7 @@ class GameWorld:
     - Providing access to locations by name
     - Managing the starting location for the player
     - Creating bidirectional connections between locations
+    - Verifying world connectivity through graph analysis
     
     Attributes:
         locations: Dictionary mapping location names to Location objects
@@ -27,13 +29,24 @@ class GameWorld:
         self.locations: Dict[str, Location] = {}
         self.starting_location: Optional[Location] = None
     
-    def add_location(self, location: Location) -> None:
+    def add_location(self, name: str, description: str, is_starting: bool = False) -> Location:
         """Add a location to the game world.
         
         Args:
-            location: The Location object to add to the world
+            name: The name of the location
+            description: The atmospheric description of the location
+            is_starting: Whether this location is the starting location
+            
+        Returns:
+            The created Location object
         """
-        self.locations[location.name] = location
+        location = Location(name, description)
+        self.locations[name] = location
+        
+        if is_starting:
+            self.starting_location = location
+        
+        return location
     
     def get_location(self, name: str) -> Optional[Location]:
         """Retrieve a location by its name.
@@ -66,7 +79,7 @@ class GameWorld:
         self.starting_location = location
     
     def connect_locations(
-        self, loc1_name: str, direction: str, loc2_name: str
+        self, loc1_name: str, loc2_name: str, direction: str
     ) -> None:
         """Create a bidirectional connection between two locations.
         
@@ -77,8 +90,8 @@ class GameWorld:
         
         Args:
             loc1_name: The name of the first location
-            direction: The direction from loc1 to loc2 (e.g., "north", "east")
             loc2_name: The name of the second location
+            direction: The direction from loc1 to loc2 (e.g., "north", "east")
             
         Raises:
             KeyError: If either location name is not found in the world
@@ -105,3 +118,44 @@ class GameWorld:
         opposite = opposite_directions.get(direction)
         if opposite:
             loc2.add_exit(opposite, loc1)
+    
+    def count_locations(self) -> int:
+        """Count the total number of locations in the game world.
+        
+        Returns:
+            The number of locations in the world
+        """
+        return len(self.locations)
+    
+    def is_fully_connected(self) -> bool:
+        """Verify that all locations are reachable from the starting location.
+        
+        Uses breadth-first search (BFS) to traverse the location graph starting
+        from the starting location. A fully connected world means every location
+        can be reached by following connections from the starting point.
+        
+        Returns:
+            True if all locations are reachable from the starting location,
+            False if the world is empty, has no starting location, or has
+            unreachable locations
+        """
+        # Cannot be connected if empty or no starting location
+        if not self.locations or self.starting_location is None:
+            return False
+        
+        # BFS to find all reachable locations
+        visited = set()
+        queue = deque([self.starting_location])
+        visited.add(self.starting_location.name)
+        
+        while queue:
+            current = queue.popleft()
+            
+            # Visit all connected locations
+            for next_location in current.exits.values():
+                if next_location.name not in visited:
+                    visited.add(next_location.name)
+                    queue.append(next_location)
+        
+        # World is fully connected if all locations were visited
+        return len(visited) == len(self.locations)

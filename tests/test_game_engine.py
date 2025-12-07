@@ -2,12 +2,13 @@
 Unit tests for the game engine module.
 
 This module contains tests for the GameEngine class, including help system integration,
-command processing, and game state management.
+command processing, game state management, movement, and feedback messages.
 """
 
 import pytest
 from unittest.mock import Mock, patch, call
 from src.game_engine import GameEngine
+from src.location import Location
 
 
 @pytest.fixture
@@ -35,6 +36,12 @@ class TestGameEngineInitialization:
         """Test that GameEngine has a help system."""
         assert hasattr(game_engine, 'help_system')
         assert game_engine.help_system is not None
+
+    def test_game_engine_has_current_location(self, game_engine):
+        """Test that GameEngine has a current location."""
+        assert hasattr(game_engine, 'current_location')
+        assert game_engine.current_location is not None
+        assert isinstance(game_engine.current_location, Location)
 
 
 class TestWelcomeMessage:
@@ -190,4 +197,118 @@ class TestGameEngineCommandProcessing:
         game_engine.process_command('  help  ')
         
         # Verify that print was called (help should be processed)
+        assert mock_output.called
+
+
+class TestMovement:
+    """Tests for movement functionality in game engine."""
+
+    def test_successful_movement_updates_location(self, game_engine):
+        """Test that successful movement updates current location."""
+        initial_location = game_engine.current_location
+        result = game_engine.move('north')
+        
+        # Verify location changed
+        assert game_engine.current_location != initial_location
+        # Verify success message returned
+        assert 'Huapai' in result
+
+    def test_successful_movement_returns_success_message(self, game_engine):
+        """Test that successful movement returns a success message."""
+        result = game_engine.move('north')
+        
+        # Verify message indicates success
+        assert 'moved' in result.lower() or 'travel' in result.lower()
+        assert 'Huapai' in result
+
+    def test_invalid_direction_does_not_change_location(self, game_engine):
+        """Test that invalid direction doesn't change location."""
+        initial_location = game_engine.current_location
+        result = game_engine.move('west')
+        
+        # Verify location unchanged
+        assert game_engine.current_location == initial_location
+        # Verify error message returned
+        assert 'cannot' in result.lower() or 'no exit' in result.lower()
+
+    def test_invalid_direction_returns_error_message(self, game_engine):
+        """Test that invalid direction returns an error message."""
+        result = game_engine.move('west')
+        
+        # Verify message indicates error
+        assert 'cannot' in result.lower() or 'no exit' in result.lower()
+
+    @pytest.mark.parametrize('direction', ['NORTH', 'North', 'north'])
+    def test_movement_case_insensitive(self, game_engine, direction):
+        """Test that movement commands are case insensitive."""
+        result = game_engine.move(direction)
+        
+        # All should result in successful movement
+        assert 'Huapai' in result
+
+    def test_movement_with_whitespace(self, game_engine):
+        """Test that movement handles whitespace correctly."""
+        result = game_engine.move('  north  ')
+        
+        # Should still work
+        assert 'Huapai' in result
+
+
+class TestUnrecognizedCommands:
+    """Tests for handling unrecognized commands."""
+
+    def test_unrecognized_command_returns_error_message(self, game_engine, mock_output):
+        """Test that unrecognized command returns an error message."""
+        game_engine.process_command('dance')
+        
+        # Get printed text
+        printed_text = ' '.join(str(call[0][0]) for call in mock_output.call_args_list)
+        
+        # Verify error message
+        assert 'not recognized' in printed_text.lower() or "don't understand" in printed_text.lower()
+
+    def test_unrecognized_command_suggests_help(self, game_engine, mock_output):
+        """Test that unrecognized command suggests help."""
+        game_engine.process_command('dance')
+        
+        # Get printed text
+        printed_text = ' '.join(str(call[0][0]) for call in mock_output.call_args_list)
+        
+        # Verify help suggestion
+        assert 'help' in printed_text.lower()
+
+    def test_unrecognized_command_does_not_change_state(self, game_engine):
+        """Test that unrecognized command doesn't change game state."""
+        initial_location = game_engine.current_location
+        
+        game_engine.process_command('dance')
+        
+        # Verify location unchanged
+        assert game_engine.current_location == initial_location
+
+
+class TestCommandNormalization:
+    """Tests for command normalization and processing."""
+
+    def test_commands_trimmed_before_processing(self, game_engine, mock_output):
+        """Test that commands are trimmed before processing."""
+        game_engine.process_command('  help  ')
+        
+        # Should still trigger help
+        assert mock_output.called
+
+    def test_commands_converted_to_lowercase(self, game_engine, mock_output):
+        """Test that commands are converted to lowercase."""
+        game_engine.process_command('HELP')
+        game_engine.process_command('Help')
+        game_engine.process_command('help')
+        
+        # All should work
+        assert mock_output.call_count >= 3
+
+    def test_extra_whitespace_handled(self, game_engine, mock_output):
+        """Test that extra whitespace is handled correctly."""
+        game_engine.process_command('   help   ')
+        
+        # Should still work
         assert mock_output.called
