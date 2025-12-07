@@ -110,6 +110,26 @@ class Location:
         """
         return self._exits.get(direction)
 
+    def has_exit(self, direction: str) -> bool:
+        """Check if an exit exists in the given direction.
+
+        Args:
+            direction: The direction to check (e.g., "north", "south").
+
+        Returns:
+            True if an exit exists in that direction, False otherwise.
+
+        Example:
+            >>> village = Location("Village")
+            >>> forest = Location("Forest")
+            >>> village.add_exit("north", forest)
+            >>> village.has_exit("north")
+            True
+            >>> village.has_exit("south")
+            False
+        """
+        return direction in self._exits
+
     def get_available_exits(self) -> List[str]:
         """Get a list of all available exit directions from this location.
 
