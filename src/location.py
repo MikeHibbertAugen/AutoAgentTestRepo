@@ -72,6 +72,7 @@ class Location:
 
         Args:
             direction: The direction of the exit (e.g., "north", "south").
+                      Direction is normalized to lowercase for consistency.
             destination: The Location object that this exit leads to.
 
         Raises:
@@ -88,13 +89,16 @@ class Location:
         if not isinstance(destination, Location):
             raise ValueError("Destination must be a Location instance")
 
-        self._exits[direction] = destination
+        # Normalize direction to lowercase for case-insensitive matching
+        normalized_direction = direction.lower().strip()
+        self._exits[normalized_direction] = destination
 
     def get_exit(self, direction: str) -> Optional["Location"]:
         """Get the destination location for a given direction.
 
         Args:
             direction: The direction to query (e.g., "north", "south").
+                      Case-insensitive and whitespace is trimmed.
 
         Returns:
             The Location object in that direction, or None if no exit exists.
@@ -105,16 +109,22 @@ class Location:
             >>> village.add_exit("north", forest)
             >>> village.get_exit("north") == forest
             True
+            >>> village.get_exit("NORTH") == forest
+            True
             >>> village.get_exit("south") is None
             True
         """
-        return self._exits.get(direction)
+        if not isinstance(direction, str):
+            return None
+        normalized_direction = direction.lower().strip()
+        return self._exits.get(normalized_direction)
 
     def has_exit(self, direction: str) -> bool:
         """Check if an exit exists in the given direction.
 
         Args:
             direction: The direction to check (e.g., "north", "south").
+                      Case-insensitive and whitespace is trimmed.
 
         Returns:
             True if an exit exists in that direction, False otherwise.
@@ -125,10 +135,15 @@ class Location:
             >>> village.add_exit("north", forest)
             >>> village.has_exit("north")
             True
+            >>> village.has_exit("NORTH")
+            True
             >>> village.has_exit("south")
             False
         """
-        return direction in self._exits
+        if not isinstance(direction, str):
+            return False
+        normalized_direction = direction.lower().strip()
+        return normalized_direction in self._exits
 
     def get_available_exits(self) -> List[str]:
         """Get a list of all available exit directions from this location.
@@ -192,6 +207,7 @@ class Location:
 
         Args:
             direction: The direction to query (e.g., "north", "south").
+                      Case-insensitive and whitespace is trimmed.
 
         Returns:
             The Location object in that direction, or None if no exit exists.

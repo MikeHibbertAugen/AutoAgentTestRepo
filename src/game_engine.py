@@ -7,6 +7,12 @@ and coordinates game flow for the text-based adventure game.
 
 from typing import Optional, Dict, Any
 from src.help_system import HelpSystem
+from src.command_processor import normalize_command, parse_command, is_valid_command
+from src.feedback_messages import (
+    get_movement_success_message,
+    get_invalid_direction_message,
+    get_unrecognized_command_message
+)
 
 
 class GameEngine:
@@ -73,22 +79,26 @@ class GameEngine:
         Returns:
             Optional[str]: Response message or None if command is invalid.
         """
-        command = command.strip().lower()
+        # Normalize the command (trim whitespace and convert to lowercase)
+        normalized_command = normalize_command(command)
         
-        if not command:
+        if not normalized_command:
             return None
         
+        # Parse the command
+        cmd, args = parse_command(normalized_command)
+        
         # Handle help command
-        if command == "help":
+        if cmd == "help":
             return self.help_system.get_help_text()
         
         # Handle quit command
-        if command == "quit":
+        if cmd == "quit":
             self.running = False
             return "Thanks for playing! Goodbye!"
         
         # Handle look command
-        if command == "look":
+        if cmd == "look":
             return self.look()
         
         # Handle movement commands
@@ -103,11 +113,15 @@ class GameEngine:
             "west": "west"
         }
         
-        if command in direction_map:
-            direction = direction_map[command]
+        if cmd in direction_map:
+            direction = direction_map[cmd]
             return self.move(direction)
         
-        return f"I don't understand '{command}'. Type 'help' for available commands."
+        # Check if command is recognized
+        if not is_valid_command(cmd):
+            return get_unrecognized_command_message(cmd)
+        
+        return f"I don't understand '{cmd}'. Type 'help' for available commands."
     
     def move(self, direction: str) -> str:
         """
@@ -127,10 +141,19 @@ class GameEngine:
         next_location = current.get(direction)
         
         if next_location is None:
-            return f"You cannot go {direction} from here."
+            return get_invalid_direction_message(direction)
         
         self.current_location = next_location
-        return self.look()
+        
+        # Get the new location's name for the success message
+        new_location_data = self.locations.get(next_location, {})
+        location_name = next_location.replace("_", " ").title()
+        
+        # Return success message followed by location description
+        success_msg = get_movement_success_message(location_name)
+        description = self.look()
+        
+        return f"{success_msg}\n{description}"
     
     def look(self) -> str:
         """
