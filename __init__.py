@@ -1,11 +1,12 @@
 """
-Counter package initialization.
+Game world package initialization.
 
-This package provides a Counter class with configurable start and end values.
+This package provides core game world components for a text-based adventure game
+set in north-west Auckland.
 """
 
-from .counter import Counter
+from .location import Location
 
-__all__ = ['Counter']
+__all__ = ['Location']
 
 __version__ = '0.1.0'
