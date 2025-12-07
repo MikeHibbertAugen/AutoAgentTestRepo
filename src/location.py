@@ -148,6 +148,65 @@ class Location:
         """
         return list(self._exits.keys())
 
+    def get_exits(self) -> List[str]:
+        """Get a list of all available exit directions from this location.
+
+        This method is an alias for get_available_exits() to match the
+        implementation plan requirements.
+
+        Returns:
+            A list of direction strings for all exits from this location.
+            Returns an empty list if there are no exits.
+
+        Example:
+            >>> village = Location("Village")
+            >>> village.get_exits()
+            []
+            >>> village.add_exit("north", Location("Forest"))
+            >>> village.get_exits()
+            ['north']
+        """
+        return self.get_available_exits()
+
+    def has_exits(self) -> bool:
+        """Check if this location has any exits.
+
+        Returns:
+            True if the location has at least one exit, False otherwise.
+
+        Example:
+            >>> village = Location("Village")
+            >>> village.has_exits()
+            False
+            >>> village.add_exit("north", Location("Forest"))
+            >>> village.has_exits()
+            True
+        """
+        return len(self._exits) > 0
+
+    def get_exit_destination(self, direction: str) -> Optional["Location"]:
+        """Get the destination location for a given direction.
+
+        This method is an alias for get_exit() to match the implementation
+        plan requirements.
+
+        Args:
+            direction: The direction to query (e.g., "north", "south").
+
+        Returns:
+            The Location object in that direction, or None if no exit exists.
+
+        Example:
+            >>> village = Location("Village")
+            >>> forest = Location("Forest")
+            >>> village.add_exit("north", forest)
+            >>> village.get_exit_destination("north") == forest
+            True
+            >>> village.get_exit_destination("south") is None
+            True
+        """
+        return self.get_exit(direction)
+
     def __repr__(self) -> str:
         """Return a string representation of the location.
 

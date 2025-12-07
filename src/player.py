@@ -37,12 +37,26 @@ class Player:
         """
         return self.current_location
     
+    def move_to(self, location) -> None:
+        """
+        Move the player to a new location.
+        
+        This method updates the player's current location to the specified
+        location object. It is typically called by the game controller after
+        validating that the movement is allowed.
+        
+        Args:
+            location: The Location object to move the player to
+        """
+        self.current_location = location
+    
     def set_location(self, location) -> None:
         """
         Set the player's location.
         
         This method is used by the movement system to update the player's
-        position after a successful move command.
+        position after a successful move command. This is an alias for
+        move_to() to maintain backward compatibility.
         
         Args:
             location: The Location object to move the player to
