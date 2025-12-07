@@ -1,175 +1,117 @@
 """
-BDD-style tests for player state management.
+Unit tests for Player class.
 
 Tests cover:
-- Player initialization at starting location
-- Location tracking
-- Successful movement between locations
-- Blocked movement with error handling
+- Player initialization
+- Current location tracking
+- Location updates
 """
 
 import pytest
 from src.player import Player
-from src.world import World, Location
+from src.location import Location
 
 
-@pytest.fixture
-def world():
-    """Create a test world with multiple locations."""
-    test_world = World()
+class TestPlayerInitialization:
+    """Tests for player initialization."""
     
-    # Create locations
-    helensville = Location("Helensville")
-    parakai = Location("Parakai")
-    kumeu = Location("Kumeu")
-    muriwai_beach = Location("Muriwai Beach")
+    def test_player_initialized_with_location(self):
+        """Test that a player can be initialized with a location."""
+        # Given
+        location = Location("Kumeu")
+        
+        # When
+        player = Player(location)
+        
+        # Then
+        assert player.current_location == location
+        assert player.get_current_location() == location
     
-    # Set up connections
-    helensville.add_exit("south", "Parakai")
-    helensville.add_exit("east", "Kumeu")
-    parakai.add_exit("north", "Helensville")
-    kumeu.add_exit("west", "Helensville")
-    kumeu.add_exit("north", "Muriwai Beach")
-    muriwai_beach.add_exit("south", "Kumeu")
-    
-    # Add locations to world
-    test_world.add_location(helensville)
-    test_world.add_location(parakai)
-    test_world.add_location(kumeu)
-    test_world.add_location(muriwai_beach)
-    
-    return test_world
+    def test_player_stores_location_reference(self):
+        """Test that player stores the actual location object."""
+        # Given
+        location = Location("Helensville")
+        
+        # When
+        player = Player(location)
+        
+        # Then
+        assert player.current_location is location
 
 
-@pytest.fixture
-def player(world):
-    """Create a player in the test world."""
-    return Player(world)
+class TestLocationTracking:
+    """Tests for tracking and updating player location."""
+    
+    def test_get_current_location(self):
+        """Test getting the current location."""
+        # Given
+        location = Location("Parakai")
+        player = Player(location)
+        
+        # When
+        current = player.get_current_location()
+        
+        # Then
+        assert current == location
+    
+    def test_set_location(self):
+        """Test setting a new location."""
+        # Given
+        kumeu = Location("Kumeu")
+        huapai = Location("Huapai")
+        player = Player(kumeu)
+        
+        # When
+        player.set_location(huapai)
+        
+        # Then
+        assert player.current_location == huapai
+        assert player.get_current_location() == huapai
+    
+    def test_location_updates_persist(self):
+        """Test that location updates persist across multiple changes."""
+        # Given
+        location1 = Location("Location1")
+        location2 = Location("Location2")
+        location3 = Location("Location3")
+        player = Player(location1)
+        
+        # When
+        player.set_location(location2)
+        player.set_location(location3)
+        
+        # Then
+        assert player.get_current_location() == location3
+    
+    def test_multiple_location_changes(self):
+        """Test multiple consecutive location changes."""
+        # Given
+        locations = [Location(f"Location{i}") for i in range(5)]
+        player = Player(locations[0])
+        
+        # When/Then
+        for i, location in enumerate(locations):
+            if i > 0:
+                player.set_location(location)
+            assert player.get_current_location() == location
 
 
-def test_initialize_player_at_starting_location(world):
-    """
-    Scenario: Initialize player at starting location
-    Given the game world is initialized
-    When a new game is started
-    Then the player should be at "Helensville"
-    """
-    # Given the game world is initialized (world fixture)
+class TestPlayerState:
+    """Tests for player state management."""
     
-    # When a new game is started
-    player = Player(world)
-    
-    # Then the player should be at "Helensville"
-    assert player.get_current_location() == "Helensville"
-
-
-def test_track_player_current_location(world):
-    """
-    Scenario: Track player current location
-    Given the player is at "Kumeu"
-    When the location is queried
-    Then it should return "Kumeu"
-    """
-    # Given the player is at "Kumeu"
-    player = Player(world, starting_location="Kumeu")
-    
-    # When the location is queried
-    current_location = player.get_current_location()
-    
-    # Then it should return "Kumeu"
-    assert current_location == "Kumeu"
-
-
-def test_successful_movement(player):
-    """
-    Scenario: Successful movement
-    Given the player is at "Helensville"
-    And there is an exit south to "Parakai"
-    When the player moves south
-    Then the player should be at "Parakai"
-    And the movement should be successful
-    """
-    # Given the player is at "Helensville"
-    assert player.get_current_location() == "Helensville"
-    
-    # And there is an exit south to "Parakai" (already set up in world fixture)
-    
-    # When the player moves south
-    success, message = player.move("south")
-    
-    # Then the player should be at "Parakai"
-    assert player.get_current_location() == "Parakai"
-    
-    # And the movement should be successful
-    assert success is True
-    assert message == "Moved south to Parakai"
-
-
-def test_blocked_movement(world):
-    """
-    Scenario: Blocked movement
-    Given the player is at "Muriwai Beach"
-    And there is no exit to the north
-    When the player attempts to move north
-    Then the player should remain at "Muriwai Beach"
-    And an error message should be generated
-    """
-    # Given the player is at "Muriwai Beach"
-    player = Player(world, starting_location="Muriwai Beach")
-    assert player.get_current_location() == "Muriwai Beach"
-    
-    # And there is no exit to the north (no north exit from Muriwai Beach)
-    
-    # When the player attempts to move north
-    success, message = player.move("north")
-    
-    # Then the player should remain at "Muriwai Beach"
-    assert player.get_current_location() == "Muriwai Beach"
-    
-    # And an error message should be generated
-    assert success is False
-    assert "cannot go north" in message.lower() or "no exit" in message.lower()
-
-
-def test_multiple_movements(player):
-    """
-    Test multiple consecutive movements to verify state persistence.
-    """
-    # Start at Helensville
-    assert player.get_current_location() == "Helensville"
-    
-    # Move south to Parakai
-    success, _ = player.move("south")
-    assert success is True
-    assert player.get_current_location() == "Parakai"
-    
-    # Move back north to Helensville
-    success, _ = player.move("north")
-    assert success is True
-    assert player.get_current_location() == "Helensville"
-    
-    # Move east to Kumeu
-    success, _ = player.move("east")
-    assert success is True
-    assert player.get_current_location() == "Kumeu"
-    
-    # Move north to Muriwai Beach
-    success, _ = player.move("north")
-    assert success is True
-    assert player.get_current_location() == "Muriwai Beach"
-
-
-def test_invalid_direction(player):
-    """
-    Test movement with an invalid direction that doesn't exist.
-    """
-    # Player starts at Helensville
-    assert player.get_current_location() == "Helensville"
-    
-    # Try to move in an invalid direction
-    success, message = player.move("northeast")
-    
-    # Player should remain at Helensville
-    assert player.get_current_location() == "Helensville"
-    assert success is False
-    assert message is not None
+    def test_player_maintains_location_state(self):
+        """Test that player maintains location state correctly."""
+        # Given
+        start_location = Location("Start")
+        player = Player(start_location)
+        
+        # When
+        current_before = player.get_current_location()
+        new_location = Location("Destination")
+        player.set_location(new_location)
+        current_after = player.get_current_location()
+        
+        # Then
+        assert current_before == start_location
+        assert current_after == new_location
+        assert current_before != current_after

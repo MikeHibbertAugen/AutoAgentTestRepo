@@ -5,66 +5,46 @@ This module provides the Player class that manages player state including
 current location and movement between locations in the game world.
 """
 
-from typing import Tuple, Optional
+from typing import Optional
 
 
 class Player:
     """
     Manages player state and location in the game world.
     
-    The Player class tracks the player's current location and handles
-    movement between locations with validation.
+    The Player class tracks the player's current location and provides
+    methods to query and update the player's position.
     
     Attributes:
-        world: Reference to the World instance containing all locations
-        current_location: Name of the player's current location
+        current_location: The Location object where the player is currently positioned
     """
     
-    def __init__(self, world, starting_location: str = "Helensville"):
+    def __init__(self, starting_location):
         """
-        Initialize a new player in the game world.
+        Initialize a new player at a specific location.
         
         Args:
-            world: The World instance containing all game locations
-            starting_location: The name of the location where player starts
-                             (default: "Helensville")
+            starting_location: The Location object where the player starts
         """
-        self.world = world
         self.current_location = starting_location
     
-    def get_location(self) -> str:
+    def get_current_location(self):
         """
-        Get the name of the player's current location.
+        Get the player's current location.
         
         Returns:
-            The name of the current location as a string
+            The Location object where the player is currently positioned
         """
         return self.current_location
     
-    def move(self, direction: str) -> Tuple[bool, Optional[str]]:
+    def set_location(self, location) -> None:
         """
-        Attempt to move the player in the specified direction.
+        Set the player's location.
         
-        Validates that an exit exists in the given direction from the current
-        location. If valid, updates the player's location. If invalid, the
-        player remains at the current location.
+        This method is used by the movement system to update the player's
+        position after a successful move command.
         
         Args:
-            direction: The direction to move (e.g., "north", "south", "east", "west")
-        
-        Returns:
-            A tuple containing:
-                - bool: True if movement was successful, False otherwise
-                - str or None: Error message if movement failed, None if successful
+            location: The Location object to move the player to
         """
-        location = self.world.get_location(self.current_location)
-        
-        if location is None:
-            return False, f"Current location '{self.current_location}' not found in world"
-        
-        if not location.has_exit(direction):
-            return False, f"Cannot move {direction} from {self.current_location}"
-        
-        destination = location.get_exit(direction)
-        self.current_location = destination
-        return True, None
+        self.current_location = location
