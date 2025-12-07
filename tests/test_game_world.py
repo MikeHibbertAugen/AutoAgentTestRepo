@@ -190,6 +190,99 @@ class TestConnectLocations:
         assert town_square.get_exit("west").get_exit("east") == town_square
 
 
+class TestCountLocations:
+    """Tests for counting locations in the world."""
+
+    def test_count_empty_world(self, empty_world):
+        """Test counting locations in an empty world."""
+        assert empty_world.count_locations() == 0
+
+    def test_count_single_location(self, empty_world):
+        """Test counting a single location."""
+        location = Location("Test", "A test location.")
+        empty_world.add_location(location)
+        assert empty_world.count_locations() == 1
+
+    def test_count_multiple_locations(self, populated_world):
+        """Test counting multiple locations."""
+        assert populated_world.count_locations() == 3
+
+
+class TestWorldConnectivity:
+    """Tests for checking world connectivity."""
+
+    def test_empty_world_not_connected(self, empty_world):
+        """Test that an empty world is not fully connected."""
+        assert empty_world.is_fully_connected() is False
+
+    def test_single_location_as_starting(self, empty_world):
+        """Test that a single location world is fully connected."""
+        location = Location("Solo", "The only location.")
+        empty_world.add_location(location)
+        empty_world.set_starting_location(location)
+        assert empty_world.is_fully_connected() is True
+
+    def test_fully_connected_world(self, populated_world, sample_locations):
+        """Test a fully connected world."""
+        town_square, forest, beach = sample_locations
+        
+        # Set starting location
+        populated_world.set_starting_location(town_square)
+        
+        # Connect all locations
+        populated_world.connect_locations("Town Square", "north", "Forest")
+        populated_world.connect_locations("Town Square", "east", "Beach")
+        
+        assert populated_world.is_fully_connected() is True
+
+    def test_disconnected_world(self, empty_world):
+        """Test a world with disconnected locations."""
+        loc1 = Location("Location 1", "First location.")
+        loc2 = Location("Location 2", "Second location.")
+        loc3 = Location("Location 3", "Third isolated location.")
+        
+        empty_world.add_location(loc1)
+        empty_world.add_location(loc2)
+        empty_world.add_location(loc3)
+        
+        # Connect only loc1 and loc2
+        empty_world.connect_locations("Location 1", "north", "Location 2")
+        
+        # Set starting location
+        empty_world.set_starting_location(loc1)
+        
+        # loc3 is isolated, so world is not fully connected
+        assert empty_world.is_fully_connected() is False
+
+    def test_world_without_starting_location(self, populated_world):
+        """Test that a world without a starting location is not connected."""
+        populated_world.connect_locations("Town Square", "north", "Forest")
+        populated_world.connect_locations("Forest", "east", "Beach")
+        
+        # No starting location set
+        assert populated_world.is_fully_connected() is False
+
+    def test_complex_connected_world(self, empty_world):
+        """Test a more complex fully connected world."""
+        # Create a ring of locations
+        locations = []
+        for i in range(5):
+            loc = Location(f"Location {i}", f"Location number {i}.")
+            empty_world.add_location(loc)
+            locations.append(loc)
+        
+        # Connect in a ring
+        empty_world.connect_locations("Location 0", "east", "Location 1")
+        empty_world.connect_locations("Location 1", "east", "Location 2")
+        empty_world.connect_locations("Location 2", "east", "Location 3")
+        empty_world.connect_locations("Location 3", "east", "Location 4")
+        empty_world.connect_locations("Location 4", "north", "Location 0")
+        
+        empty_world.set_starting_location(locations[0])
+        
+        assert empty_world.is_fully_connected() is True
+
+
 class TestGameWorldIntegration:
     """Integration tests for complete game world workflows."""
 

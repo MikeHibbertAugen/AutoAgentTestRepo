@@ -31,6 +31,8 @@ from src.world_initializer import initialize_world
 from src.location_display import LocationDisplay
 from src.player import Player
 from src.game_controller import GameController
+from src.game_world import GameWorld
+from src.locations_data import populate_nw_auckland_world
 
 # Reverse a string
 result = reverse_string("hello")
@@ -97,6 +99,20 @@ print(game.handle_move_command("Castle"))
 # === Castle ===
 # An imposing stone fortress
 # Exits: south
+
+# Create and populate NW Auckland game world
+world = GameWorld()
+populate_nw_auckland_world(world)
+
+# Access the starting location
+start = world.starting_location
+print(f"Game starts at: {start.name}")
+print(f"Description: {start.description}")
+
+# Navigate the world
+current = start
+for direction in current.connections.keys():
+    print(f"You can go {direction}")
 ```
 
 ## Location Description System
@@ -353,94 +369,115 @@ print(game.look_around())
 
 ## Game World System
 
-A text-based adventure game world system set in north-west Auckland, featuring interconnected locations that players can navigate through. The system provides a complete game world initialization with specific Auckland locations and bidirectional navigation.
+A comprehensive game world management system for text-based adventure games, featuring location graphs with bidirectional connections and full connectivity analysis. The system includes authentic north-west Auckland locations for an immersive New Zealand gaming experience.
 
-### Location System
+### Quick Start
 
-The `Location` class represents individual game locations with directional exits.
+```python
+from src.game_world import GameWorld, Location
+from src.locations_data import populate_nw_auckland_world
+
+# Create and populate a complete NW Auckland game world
+world = GameWorld()
+populate_nw_auckland_world(world)
+
+# Start exploring from Helensville
+current_location = world.starting_location
+print(f"You are at: {current_location.name}")
+print(f"{current_location.description}")
+
+# Check available connections
+for direction, connected_loc in current_location.connections.items():
+    print(f"Go {direction} to {connected_loc.name}")
+
+# Navigate to Parakai
+if "north" in current_location.connections:
+    current_location = current_location.connections["north"]
+    print(f"\nYou travel north to: {current_location.name}")
+    print(f"{current_location.description}")
+```
+
+### Core Components
+
+#### Location Class
+
+Represents individual game locations with names, descriptions, and directional connections to other locations.
 
 **Usage:**
 
 ```python
-from src.location import Location
+from src.game_world import Location
 
 # Create locations
-beach = Location("Muriwai Beach", "A beautiful black sand beach on the west coast")
-forest = Location("Waitakere Ranges", "Dense native forest with walking trails")
-cafe = Location("Piha Cafe")  # Description is optional
+helensville = Location(
+    name="Helensville",
+    description="A historic town on the banks of the Kaipara River",
+    is_starting=True
+)
 
-# Connect locations with directional exits
-beach.add_exit("east", forest)
-beach.add_exit("north", cafe)
-forest.add_exit("west", beach)
-cafe.add_exit("south", beach)
+parakai = Location(
+    name="Parakai",
+    description="Home to natural hot springs and pools"
+)
 
-# Query location information
-print(beach.name)  # Output: Muriwai Beach
-print(beach.description)  # Output: A beautiful black sand beach on the west coast
-print(beach.get_available_exits())  # Output: ['east', 'north']
+# Check starting location flag
+print(helensville.is_starting)  # Output: True
+print(parakai.is_starting)  # Output: False
+
+# Add connections between locations
+helensville.connections["north"] = parakai
+parakai.connections["south"] = helensville
 
 # Navigate between locations
-next_location = beach.get_exit("east")
+next_location = helensville.connections.get("north")
 if next_location:
-    print(f"You travel east to {next_location.name}")
-    # Output: You travel east to Waitakere Ranges
-
-# Check for invalid exits
-unknown = beach.get_exit("west")
-print(unknown)  # Output: None
-
-# Check if an exit exists
-print(beach.has_exit("east"))  # Output: True
-print(beach.has_exit("west"))  # Output: False
+    print(f"Going north to: {next_location.name}")
 ```
 
 **Location API:**
-- `__init__(name: str, description: str = "")` - Create a location with name and optional description
-- `add_exit(direction: str, destination: Location) -> None` - Add an exit in a specific direction
-- `get_exit(direction: str) -> Optional[Location]` - Get the destination location for a direction
-- `has_exit(direction: str) -> bool` - Check if an exit exists in a specific direction
-- `get_available_exits() -> List[str]` - Get list of all available exit directions
-- `name: str` - Property to access location name
-- `description: str` - Property to access location description
+- `__init__(name: str, description: str, is_starting: bool = False)` - Create a location
+- `name: str` - Location name (read-only property)
+- `description: str` - Location description (read-only property)
+- `is_starting: bool` - Flag indicating if this is the starting location (read-only property)
+- `connections: dict[str, Location]` - Dictionary mapping directions to connected locations
 
-### Game World Manager
+#### GameWorld Class
 
-The `GameWorld` class manages the collection of locations and their connections.
+Manages the collection of all locations and provides methods for building and analyzing the game world graph.
 
 **Usage:**
 
 ```python
-from src.game_world import GameWorld
-from src.location import Location
+from src.game_world import GameWorld, Location
 
-# Create a game world
+# Create an empty game world
 world = GameWorld()
 
-# Create locations
-helensville = Location("Helensville", "A rural town in north-west Auckland")
-parakai = Location("Parakai", "Home to natural hot springs")
-kumeu = Location("Kumeu", "Wine country with numerous vineyards")
-
 # Add locations to the world
-world.add_location(helensville)
-world.add_location(parakai)
-world.add_location(kumeu)
+helensville = Location("Helensville", "A historic town", is_starting=True)
+kumeu = Location("Kumeu", "The heart of Auckland's wine country")
+muriwai = Location("Muriwai Beach", "A wild west coast beach")
 
-# Set starting location
-world.set_starting_location(helensville)
+world.add_location(helensville)
+world.add_location(kumeu)
+world.add_location(muriwai)
 
 # Connect locations bidirectionally
-world.connect_locations("Helensville", "north", "Parakai")
-# This creates both: Helensville -> north -> Parakai AND Parakai -> south -> Helensville
+world.connect_locations("Helensville", "Kumeu", "east")
+# This creates: Helensville --east--> Kumeu AND Kumeu --west--> Helensville
 
-# Check if locations exist
-print(world.has_location("Helensville"))  # Output: True
-print(world.has_location("Wellington"))  # Output: False
+world.connect_locations("Kumeu", "Muriwai Beach", "west")
+# This creates: Kumeu --west--> Muriwai Beach AND Muriwai Beach --east--> Kumeu
 
-# Retrieve locations by name
+# Access locations
 location = world.get_location("Kumeu")
 print(location.name)  # Output: Kumeu
+
+# Count total locations
+print(world.count_locations())  # Output: 3
+
+# Check if world is fully connected (all locations reachable from start)
+print(world.is_fully_connected())  # Output: True
 
 # Access starting location
 print(world.starting_location.name)  # Output: Helensville
@@ -449,118 +486,219 @@ print(world.starting_location.name)  # Output: Helensville
 **GameWorld API:**
 - `__init__()` - Create an empty game world
 - `add_location(location: Location) -> None` - Add a location to the world
-- `get_location(name: str) -> Optional[Location]` - Retrieve a location by name
-- `has_location(name: str) -> bool` - Check if a location exists in the world
-- `set_starting_location(location: Location) -> None` - Set the starting location for the game
-- `connect_locations(loc1_name: str, direction: str, loc2_name: str) -> None` - Create bidirectional connection between locations
+- `get_location(name: str) -> Optional[Location]` - Get location by name
+- `connect_locations(loc1_name: str, loc2_name: str, direction: str) -> None` - Create bidirectional connection
+- `count_locations() -> int` - Get total number of locations in world
+- `is_fully_connected() -> bool` - Check if all locations are reachable from starting location
 - `starting_location: Optional[Location]` - Property to access the starting location
+- `locations: dict[str, Location]` - Dictionary of all locations indexed by name
 
-### World Initializer
+**Bidirectional Connection Details:**
 
-The `initialize_world()` function creates a complete game world for north-west Auckland with all locations and connections pre-configured.
+When you call `connect_locations(loc1, loc2, direction)`, the system automatically creates both directions:
+- Location 1 → Location 2 in the specified direction
+- Location 2 → Location 1 in the opposite direction
+
+Direction opposites:
+- north ↔ south
+- east ↔ west
+- northeast ↔ southwest
+- northwest ↔ southeast
+
+### North-West Auckland Locations
+
+The `populate_nw_auckland_world()` function creates a complete game world featuring authentic north-west Auckland locations.
 
 **Usage:**
 
 ```python
-from src.world_initializer import initialize_world
+from src.game_world import GameWorld
+from src.locations_data import populate_nw_auckland_world
 
-# Initialize the complete Auckland game world
-world = initialize_world()
+# Create and populate the world
+world = GameWorld()
+populate_nw_auckland_world(world)
 
-# Start at the default location (Helensville)
-current_location = world.starting_location
-print(f"You are at: {current_location.name}")
-print(f"Description: {current_location.description}")
+# Explore from the starting location
+current = world.starting_location
+print(f"Starting at: {current.name}")
+print(f"{current.description}")
 
-# Explore available exits
-exits = current_location.get_available_exits()
-print(f"You can go: {', '.join(exits)}")
-
-# Navigate to Parakai
-if current_location.has_exit("north"):
-    current_location = current_location.get_exit("north")
-    print(f"Traveled north to: {current_location.name}")
-
-# Navigate back to Helensville
-if current_location.has_exit("south"):
-    current_location = current_location.get_exit("south")
-    print(f"Traveled south to: {current_location.name}")
-
-# Access specific locations
-kumeu = world.get_location("Kumeu")
-huapai = world.get_location("Huapai")
-print(f"{kumeu.name} is connected to {huapai.name}")
+# Navigate the world
+if "north" in current.connections:
+    current = current.connections["north"]
+    print(f"\nTraveled north to: {current.name}")
+    print(f"{current.description}")
 ```
 
-**Auckland Locations:**
+**Featured Locations:**
 
-The game world includes the following north-west Auckland locations:
-- **Helensville** - Starting location, a rural town in north-west Auckland
-- **Parakai** - Home to natural hot springs
-- **Kumeu** - Wine country with numerous vineyards
-- **Huapai** - A charming village near Kumeu
-- **Riverhead** - Historic village at the head of the Waitemata Harbour
-- **Coatesville** - Semi-rural area with lifestyle blocks
-- **Muriwai Beach** - Black sand beach with dramatic gannet colony
+The world includes these authentic north-west Auckland locations (8+ locations):
+- **Helensville** (Starting Location) - A historic town on the banks of the Kaipara River
+- **Parakai** - Home to natural hot springs and pools
+- **Kumeu** - The heart of Auckland's wine country with numerous vineyards
+- **Huapai** - A charming wine region village near Kumeu
+- **Muriwai Beach** - A wild west coast beach famous for its gannet colony
+- **Waimauku** - A rural township connecting to the coast
+- **Riverhead** - A historic wharf town on the upper Waitemata Harbour
+- **Coatesville** - A semi-rural area with lifestyle properties
+- And more...
 
 **Location Connections:**
 
-The following bidirectional connections are established:
+The world features bidirectional connections including:
 - Helensville ↔ Parakai (north/south)
 - Kumeu ↔ Huapai (north/south)
-- Riverhead ↔ Coatesville (east/west)
+- Muriwai Beach ↔ Waimauku (east/west)
+- Riverhead ↔ Kumeu (connections vary)
+- Riverhead ↔ Coatesville (connections vary)
+- Additional connections ensuring full world connectivity
 
 **Features:**
-- Pre-configured Auckland locations with descriptions
-- Bidirectional navigation (if A connects to B, then B connects to A)
-- Helensville set as the starting location
-- Type-safe with full type hints
-- Comprehensive error handling
-- 100% test coverage
-- BDD scenarios for behavior validation
+- Minimum 8 distinct Auckland locations
+- All locations reachable from Helensville (fully connected graph)
+- Authentic location descriptions matching real geography
+- Bidirectional navigation between all connected locations
+- Starting location clearly designated
 
-**Example Game World Exploration:**
+### Complete Example
 
 ```python
-from src.world_initializer import initialize_world
+from src.game_world import GameWorld
+from src.locations_data import populate_nw_auckland_world
 
-# Initialize world
-world = initialize_world()
+# Initialize the NW Auckland game world
+world = GameWorld()
+populate_nw_auckland_world(world)
+
+print("=== Welcome to North-West Auckland Adventure ===\n")
+
+# Verify world is properly set up
+print(f"Total locations: {world.count_locations()}")
+print(f"Fully connected: {world.is_fully_connected()}")
+print()
 
 # Start the game
 current = world.starting_location
-print(f"=== Welcome to North-West Auckland Adventure ===")
-print(f"You are at: {current.name}")
-print(f"{current.description}")
+print(f"You begin your journey in {current.name}")
+print(f"{current.description}\n")
+
+# Show available directions
+print("Available directions:")
+for direction in current.connections.keys():
+    destination = current.connections[direction]
+    print(f"  {direction} -> {destination.name}")
 print()
 
 # Explore Parakai
-print(f"Available exits: {', '.join(current.get_available_exits())}")
-current = current.get_exit("north")
-print(f"\nYou travel north to: {current.name}")
-print(f"{current.description}")
+if "north" in current.connections:
+    current = current.connections["north"]
+    print(f"You travel north to {current.name}")
+    print(f"{current.description}\n")
 
 # Return to Helensville
-current = current.get_exit("south")
-print(f"\nYou travel south back to: {current.name}")
+if "south" in current.connections:
+    current = current.connections["south"]
+    print(f"You travel south back to {current.name}")
+    print(f"{current.description}\n")
 
-# Explore Kumeu and Huapai
+# Explore wine country
 kumeu = world.get_location("Kumeu")
-print(f"\n--- Exploring wine country ---")
-print(f"You are at: {kumeu.name}")
-print(f"{kumeu.description}")
-print(f"Available exits: {', '.join(kumeu.get_available_exits())}")
-
-huapai = kumeu.get_exit("north")
-print(f"\nYou travel north to: {huapai.name}")
-print(f"{huapai.description}")
-
-# Verify bidirectional connection
-back_to_kumeu = huapai.get_exit("south")
-print(f"\nYou can return south to: {back_to_kumeu.name}")
+if kumeu:
+    print(f"You travel to {kumeu.name}")
+    print(f"{kumeu.description}\n")
+    
+    # Visit neighboring locations
+    for direction, destination in kumeu.connections.items():
+        print(f"From here you can go {direction} to {destination.name}")
 ```
 
-For detailed documentation, see [Location Architecture Documentation](docs/architecture.md)
+### Graph Analysis
+
+The `is_fully_connected()` method uses breadth-first search to verify that all locations in the world can be reached from the starting location.
+
+```python
+from src.game_world import GameWorld, Location
+
+world = GameWorld()
+
+# Add locations
+start = Location("Start", "The beginning", is_starting=True)
+middle = Location("Middle", "The middle point")
+end = Location("End", "The destination")
+isolated = Location("Isolated", "Cannot reach this")
+
+world.add_location(start)
+world.add_location(middle)
+world.add_location(end)
+world.add_location(isolated)
+
+# Connect only some locations
+world.connect_locations("Start", "Middle", "north")
+world.connect_locations("Middle", "End", "east")
+
+# Check connectivity
+print(world.is_fully_connected())  # Output: False (isolated location not reachable)
+
+# Connect the isolated location
+world.connect_locations("End", "Isolated", "north")
+print(world.is_fully_connected())  # Output: True (all locations now reachable)
+```
+
+### API Reference
+
+**Location Class:**
+- `__init__(name: str, description: str, is_starting: bool = False)` - Create a location
+- `name: str` - Location name (property)
+- `description: str` - Location description (property)
+- `is_starting: bool` - Starting location flag (property)
+- `connections: dict[str, Location]` - Directional connections to other locations
+
+**GameWorld Class:**
+- `__init__()` - Create empty game world
+- `add_location(location: Location) -> None` - Add a location to the world
+- `get_location(name: str) -> Optional[Location]` - Retrieve location by name
+- `connect_locations(loc1_name: str, loc2_name: str, direction: str) -> None` - Create bidirectional connection
+- `count_locations() -> int` - Count total locations in world
+- `is_fully_connected() -> bool` - Check if all locations reachable from start
+- `starting_location: Optional[Location]` - Starting location property
+- `locations: dict[str, Location]` - All locations indexed by name
+
+**Data Module:**
+- `populate_nw_auckland_world(world: GameWorld) -> None` - Populate world with NW Auckland locations
+
+### Testing
+
+The game world system includes comprehensive test coverage:
+
+**Unit Tests** (`tests/test_game_world.py`):
+- Location creation and properties
+- GameWorld location management
+- Bidirectional connection creation
+- Location retrieval and counting
+- Graph connectivity analysis
+- Edge cases (empty world, isolated locations)
+
+**BDD Tests** (`tests/features/test_nw_auckland_locations.bdd.py`):
+- Helensville as starting location
+- Kumeu wine region verification
+- Muriwai Beach and coastal connections
+- Parakai hot springs location
+- Riverhead area connections
+- Minimum 8 locations requirement
+- Full world connectivity validation
+
+Run tests:
+```bash
+# Run all game world tests
+pytest tests/test_game_world.py -v
+
+# Run BDD scenario tests
+pytest tests/features/test_nw_auckland_locations.bdd.py -v
+
+# Run with coverage
+pytest tests/test_game_world.py tests/features/test_nw_auckland_locations.bdd.py --cov=src.game_world --cov=src.locations_data
+```
 
 ## Counter
 
@@ -859,137 +997,4 @@ pytest tests/test_counter.py -v
 pytest tests/test_counter_cli.py -v
 pytest tests/test_location.py -v
 pytest tests/test_game_world.py -v
-pytest tests/test_world_initializer.py -v
-pytest tests/test_location_display.py -v
-pytest tests/test_player.py -v
-pytest tests/test_game_controller.py -v
-pytest tests/test_bdd_location_description.py -v
-
-# Run BDD tests with behave
-behave tests/features/
-
-# Run location description system tests
-pytest tests/test_location_display.py -v --cov=src/location_display
-pytest tests/test_player.py -v --cov=src/player
-pytest tests/test_game_controller.py -v --cov=src/game_controller
-pytest tests/test_bdd_location_description.py -v
-
-# Run location-specific tests
-pytest tests/test_location.py -v --cov=src/location
-behave tests/features/location.feature
-
-# Run game world tests
-pytest tests/test_game_world.py -v --cov=src/game_world
-pytest tests/test_world_initializer.py -v --cov=src/world_initializer
-
-# Generate HTML coverage report
-pytest tests/ -v --cov=src --cov-report=html
-
-# Run all tests (unit + BDD)
-pytest tests/ -v --cov=src && behave tests/features/
-```
-
-### Code Quality
-
-```bash
-# Format code with Black
-black src/ tests/
-
-# Lint code with Ruff
-ruff check src/ tests/
-
-# Type check with MyPy
-mypy src/
-
-# Run all quality checks
-black src/ tests/ && ruff check src/ tests/ && mypy src/ && pytest tests/ -v --cov=src
-```
-
-### Project Structure
-
-```
-AutoAgentTestRepo/
-├── src/
-│   ├── __init__.py
-│   ├── string_utils.py
-│   ├── nelson_time.py
-│   ├── counter.py
-│   ├── counter_cli.py
-│   ├── location.py
-│   ├── location_display.py
-│   ├── player.py
-│   ├── game_controller.py
-│   ├── game_world.py
-│   └── world_initializer.py
-├── tests/
-│   ├── __init__.py
-│   ├── test_string_utils.py
-│   ├── test_nelson_time.py
-│   ├── test_counter.py
-│   ├── test_counter_cli.py
-│   ├── test_location.py
-│   ├── test_location_display.py
-│   ├── test_player.py
-│   ├── test_game_controller.py
-│   ├── test_bdd_location_description.py
-│   ├── test_game_world.py
-│   ├── test_world_initializer.py
-│   └── features/
-│       ├── __init__.py
-│       ├── counter.feature
-│       ├── location.feature
-│       ├── environment.py
-│       └── steps/
-│           ├── __init__.py
-│           ├── counter_steps.py
-│           └── location_steps.py
-├── docs/
-│   ├── api_reference.md
-│   ├── string_utils.md
-│   ├── api_integration.md
-│   ├── counter_api.md
-│   ├── counter_display.md
-│   └── architecture.md
-├── .gitignore
-├── .mypy.ini
-├── pyproject.toml
-├── requirements-dev.txt
-└── README.md
-```
-
-## Requirements
-
-### Runtime Dependencies
-- `requests` - HTTP library for API calls
-
-### Development Dependencies
-- `pytest` - Testing framework
-- `pytest-cov` - Code coverage reporting
-- `behave` - BDD testing framework
-- `black` - Code formatting
-- `ruff` - Fast Python linter
-- `mypy` - Static type checker
-
-See `requirements-dev.txt` for specific versions.
-
-## Documentation
-
-For detailed API documentation, see:
-- [API Reference](docs/api_reference.md)
-- [Counter API Documentation](docs/counter_api.md)
-- [Counter Display Documentation](docs/counter_display.md)
-- [String Utils Documentation](docs/string_utils.md)
-- [API Integration Documentation](docs/api_integration.md)
-- [Location Architecture Documentation](docs/architecture.md)
-
-## Contributing
-
-1. Ensure all tests pass: `pytest tests/ -v && behave tests/features/`
-2. Format code: `black src/ tests/`
-3. Lint code: `ruff check src/ tests/`
-4. Type check: `mypy src/`
-5. Maintain test coverage above 95%
-
-## License
-
-MIT License
+pytest tests/
