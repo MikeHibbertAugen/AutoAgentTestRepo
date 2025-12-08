@@ -1,10 +1,10 @@
 # AutoAgentTestRepo
 
-This is a test repository for string manipulation utilities, timezone services, a configurable counter implementation, and a text-based adventure game world location system.
+This is a test repository for string manipulation utilities, timezone services, a configurable counter implementation, a text-based adventure game world location system, and mathematical utilities including Pi calculation.
 
 ## Features
 
-This package provides string manipulation utilities, timezone services, a counter class, and a location-based game world system with a focus on type safety, comprehensive testing, and clean code practices.
+This package provides string manipulation utilities, timezone services, a counter class, a location-based game world system, and mathematical utilities with a focus on type safety, comprehensive testing, and clean code practices.
 
 ### Installation
 
@@ -27,6 +27,7 @@ from src.string_utils import reverse_string, capitalize_string
 from src.nelson_time import get_current_time
 from src.counter import Counter
 from src.location import Location
+from src.math_utils import calculate_pi
 
 # Reverse a string
 result = reverse_string("hello")
@@ -65,7 +66,43 @@ print(beach.name)  # Output: Muriwai Beach
 print(beach.get_available_exits())  # Output: ['east']
 next_location = beach.get_exit("east")
 print(next_location.name)  # Output: Waitakere Ranges
+
+# Calculate Pi to 6 decimal places
+pi_value = calculate_pi()
+print(f"Pi = {pi_value:.6f}")  # Output: Pi = 3.141593
 ```
+
+## Mathematical Utilities
+
+### Pi Calculation
+
+Calculate the value of Pi (π) to 6 decimal places using an efficient mathematical algorithm.
+
+**Usage:**
+
+```python
+from src.math_utils import calculate_pi
+
+# Calculate Pi
+pi_value = calculate_pi()
+print(pi_value)  # Output: 3.141592653589793
+
+# Format to 6 decimal places
+print(f"Pi = {pi_value:.6f}")  # Output: Pi = 3.141593
+```
+
+**Features:**
+- Accurate to 6 decimal places (3.141593)
+- Uses Machin's formula for fast convergence
+- Pure mathematical computation with no external dependencies
+- Deterministic output (same result every time)
+- Type-safe with full type hints
+- 100% test coverage
+
+**Algorithm:**
+The implementation uses Machin's formula, which provides excellent convergence for calculating Pi. This formula is significantly faster than simpler methods like the Leibniz formula.
+
+For detailed documentation about the algorithm and performance characteristics, see [Pi Calculation Documentation](docs/pi_calculation.md)
 
 ## Game World Location System
 
@@ -433,6 +470,7 @@ For detailed API documentation, see:
 - [String Utils Documentation](docs/string_utils.md)
 - [API Integration Documentation](docs/api_integration.md)
 - [Location Architecture Documentation](docs/architecture.md)
+- [Pi Calculation Documentation](docs/pi_calculation.md)
 
 ## Development
 
@@ -448,6 +486,7 @@ pytest tests/test_nelson_time.py -v
 pytest tests/test_counter.py -v
 pytest tests/test_counter_cli.py -v
 pytest tests/test_location.py -v
+pytest tests/test_math_utils.py -v
 
 # Run BDD tests with behave
 behave tests/features/
@@ -489,7 +528,8 @@ AutoAgentTestRepo/
 │   ├── nelson_time.py
 │   ├── counter.py
 │   ├── counter_cli.py
-│   └── location.py
+│   ├── location.py
+│   └── math_utils.py
 ├── tests/
 │   ├── __init__.py
 │   ├── test_string_utils.py
@@ -497,6 +537,7 @@ AutoAgentTestRepo/
 │   ├── test_counter.py
 │   ├── test_counter_cli.py
 │   ├── test_location.py
+│   ├── test_math_utils.py
 │   └── features/
 │       ├── __init__.py
 │       ├── counter.feature
@@ -512,7 +553,8 @@ AutoAgentTestRepo/
 │   ├── api_integration.md
 │   ├── counter_api.md
 │   ├── counter_display.md
-│   └── architecture.md
+│   ├── architecture.md
+│   └── pi_calculation.md
 ├── .gitignore
 ├── .mypy.ini
 ├── pyproject.toml
@@ -544,6 +586,7 @@ For detailed API documentation, see:
 - [String Utils Documentation](docs/string_utils.md)
 - [API Integration Documentation](docs/api_integration.md)
 - [Location Architecture Documentation](docs/architecture.md)
+- [Pi Calculation Documentation](docs/pi_calculation.md)
 
 ## Contributing
 
