@@ -1,10 +1,10 @@
 # AutoAgentTestRepo
 
-This is a test repository for string manipulation utilities, timezone services, a configurable counter implementation, and a text-based adventure game world location system.
+This is a test repository for string manipulation utilities, timezone services, a configurable counter implementation, a text-based adventure game world location system, and a Pi calculator.
 
 ## Features
 
-This package provides string manipulation utilities, timezone services, a counter class, and a location-based game world system with a focus on type safety, comprehensive testing, and clean code practices.
+This package provides string manipulation utilities, timezone services, a counter class, a location-based game world system, and a Pi calculator with a focus on type safety, comprehensive testing, and clean code practices.
 
 ### Installation
 
@@ -27,6 +27,7 @@ from src.string_utils import reverse_string, capitalize_string
 from src.nelson_time import get_current_time
 from src.counter import Counter
 from src.location import Location
+from src.pi_calculator import calculate_pi
 
 # Reverse a string
 result = reverse_string("hello")
@@ -65,7 +66,71 @@ print(beach.name)  # Output: Muriwai Beach
 print(beach.get_available_exits())  # Output: ['east']
 next_location = beach.get_exit("east")
 print(next_location.name)  # Output: Waitakere Ranges
+
+# Calculate Pi to 8 decimal places
+pi_value = calculate_pi()
+print(pi_value)  # Output: 3.14159265
 ```
+
+## Pi Calculator
+
+Calculate the mathematical constant Pi (π) to 8 decimal places using Machin's formula for fast and accurate computation.
+
+**Usage:**
+
+```python
+from src.pi_calculator import calculate_pi
+
+# Calculate Pi to 8 decimal places
+pi = calculate_pi()
+print(pi)  # Output: 3.14159265
+print(f"Pi = {pi:.8f}")  # Output: Pi = 3.14159265
+
+# Use in calculations
+radius = 5.0
+circumference = 2 * calculate_pi() * radius
+area = calculate_pi() * radius ** 2
+print(f"Circumference: {circumference:.2f}")
+print(f"Area: {area:.2f}")
+```
+
+**Features:**
+- High precision calculation using Machin's formula: π/4 = 4·arctan(1/5) - arctan(1/239)
+- Accurate to 8 decimal places (3.14159265)
+- Fast convergence with Taylor series expansion
+- No external dependencies (uses only Python standard library)
+- Type-safe with full type hints
+- Comprehensive documentation and examples
+- 100% test coverage
+- Pure mathematical calculation - deterministic and reliable
+
+**Why Machin's Formula?**
+
+Machin's formula was chosen for this implementation because:
+- **Fast convergence**: Requires fewer terms than simpler series (like Leibniz)
+- **High accuracy**: Easily achieves 8+ decimal places
+- **Computational efficiency**: Uses small integer arguments (1/5 and 1/239)
+- **Historical significance**: Used for hand calculations of Pi for centuries
+- **Reliability**: Well-tested mathematical approach
+
+**Mathematical Background:**
+
+The implementation uses Machin's formula:
+```
+π/4 = 4·arctan(1/5) - arctan(1/239)
+```
+
+Combined with Taylor series expansion for arctan:
+```
+arctan(x) = x - x³/3 + x⁵/5 - x⁷/7 + ...
+```
+
+This provides rapid convergence and excellent precision for calculating Pi.
+
+**API:**
+- `calculate_pi() -> float` - Calculate and return Pi to 8 decimal places
+
+For detailed documentation on the mathematical approach and implementation, see [Pi Calculator Documentation](docs/pi_calculator.md)
 
 ## Game World Location System
 
@@ -433,6 +498,7 @@ For detailed API documentation, see:
 - [String Utils Documentation](docs/string_utils.md)
 - [API Integration Documentation](docs/api_integration.md)
 - [Location Architecture Documentation](docs/architecture.md)
+- [Pi Calculator Documentation](docs/pi_calculator.md)
 
 ## Development
 
@@ -448,6 +514,7 @@ pytest tests/test_nelson_time.py -v
 pytest tests/test_counter.py -v
 pytest tests/test_counter_cli.py -v
 pytest tests/test_location.py -v
+pytest tests/test_pi_calculator.py -v
 
 # Run BDD tests with behave
 behave tests/features/
@@ -489,7 +556,8 @@ AutoAgentTestRepo/
 │   ├── nelson_time.py
 │   ├── counter.py
 │   ├── counter_cli.py
-│   └── location.py
+│   ├── location.py
+│   └── pi_calculator.py
 ├── tests/
 │   ├── __init__.py
 │   ├── test_string_utils.py
@@ -497,6 +565,7 @@ AutoAgentTestRepo/
 │   ├── test_counter.py
 │   ├── test_counter_cli.py
 │   ├── test_location.py
+│   ├── test_pi_calculator.py
 │   └── features/
 │       ├── __init__.py
 │       ├── counter.feature
@@ -512,7 +581,8 @@ AutoAgentTestRepo/
 │   ├── api_integration.md
 │   ├── counter_api.md
 │   ├── counter_display.md
-│   └── architecture.md
+│   ├── architecture.md
+│   └── pi_calculator.md
 ├── .gitignore
 ├── .mypy.ini
 ├── pyproject.toml
@@ -544,6 +614,7 @@ For detailed API documentation, see:
 - [String Utils Documentation](docs/string_utils.md)
 - [API Integration Documentation](docs/api_integration.md)
 - [Location Architecture Documentation](docs/architecture.md)
+- [Pi Calculator Documentation](docs/pi_calculator.md)
 
 ## Contributing
 
