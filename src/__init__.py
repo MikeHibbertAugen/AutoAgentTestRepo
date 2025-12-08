@@ -1,11 +1,11 @@
 """
-Location-based adventure game package for a text-based game set in north-west Auckland.
+Pi calculator package for high-precision mathematical constant computation.
 
-This package provides core game world models including Location for representing
-navigable game locations with descriptions and interconnected exits.
+This package provides a function to calculate Pi to exactly 13 decimal places
+using the Machin's formula with high-precision decimal arithmetic.
 """
 
-from src.location import Location
+from src.pi_calculator import calculate_pi
 
 __version__ = "0.1.0"
-__all__ = ["Location"]
+__all__ = ["calculate_pi"]
