@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "adventure-game"
 version = "0.1.0"
-description = "A text-based adventure game set in north-west Auckland"
+description = "A text-based adventure game set in north-west Auckland with mathematical utilities"
 requires-python = ">=3.9"
 
 [tool.black]

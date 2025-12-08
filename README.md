@@ -1,10 +1,10 @@
 # AutoAgentTestRepo
 
-This is a test repository for string manipulation utilities, timezone services, a configurable counter implementation, and a text-based adventure game world location system.
+This is a test repository for string manipulation utilities, timezone services, a configurable counter implementation, a text-based adventure game world location system, and mathematical utilities including Pi calculation.
 
 ## Features
 
-This package provides string manipulation utilities, timezone services, a counter class, and a location-based game world system with a focus on type safety, comprehensive testing, and clean code practices.
+This package provides string manipulation utilities, timezone services, a counter class, a location-based game world system, and mathematical computation functions with a focus on type safety, comprehensive testing, and clean code practices.
 
 ### Installation
 
@@ -27,6 +27,7 @@ from src.string_utils import reverse_string, capitalize_string
 from src.nelson_time import get_current_time
 from src.counter import Counter
 from src.location import Location
+from src.math_utils import calculate_pi
 
 # Reverse a string
 result = reverse_string("hello")
@@ -65,7 +66,48 @@ print(beach.name)  # Output: Muriwai Beach
 print(beach.get_available_exits())  # Output: ['east']
 next_location = beach.get_exit("east")
 print(next_location.name)  # Output: Waitakere Ranges
+
+# Calculate Pi to 5 decimal places
+pi_value = calculate_pi()
+print(pi_value)  # Output: 3.14159
 ```
+
+## Mathematical Utilities
+
+### Pi Calculation
+
+Calculate the value of Pi to 5 decimal places using the Leibniz formula (Gregory-Leibniz series).
+
+**Usage:**
+
+```python
+from src.math_utils import calculate_pi
+
+# Calculate Pi to 5 decimal places
+pi = calculate_pi()
+print(pi)  # Output: 3.14159
+
+# The function uses the Leibniz formula: π = 4 * (1 - 1/3 + 1/5 - 1/7 + 1/9 - ...)
+# It iterates until 5 decimal place accuracy is achieved
+```
+
+**Features:**
+- Calculates Pi to exactly 5 decimal places (3.14159)
+- Uses the Leibniz formula (Gregory-Leibniz series)
+- Type-safe with full type hints
+- Comprehensive error handling
+- Efficient convergence detection
+- 100% test coverage
+- Well-documented algorithm
+
+**Algorithm:**
+The Leibniz formula is an infinite series that converges to π/4:
+- π/4 = 1 - 1/3 + 1/5 - 1/7 + 1/9 - 1/11 + ...
+- Therefore: π = 4 * (1 - 1/3 + 1/5 - 1/7 + 1/9 - ...)
+
+The function iterates through this series until the result is accurate to 5 decimal places.
+
+For detailed technical documentation, see [Pi Calculation Documentation](docs/pi_calculation.md)
 
 ## Game World Location System
 
@@ -433,6 +475,7 @@ For detailed API documentation, see:
 - [String Utils Documentation](docs/string_utils.md)
 - [API Integration Documentation](docs/api_integration.md)
 - [Location Architecture Documentation](docs/architecture.md)
+- [Pi Calculation Documentation](docs/pi_calculation.md)
 
 ## Development
 
@@ -448,6 +491,7 @@ pytest tests/test_nelson_time.py -v
 pytest tests/test_counter.py -v
 pytest tests/test_counter_cli.py -v
 pytest tests/test_location.py -v
+pytest tests/test_math_utils.py -v
 
 # Run BDD tests with behave
 behave tests/features/
@@ -489,7 +533,8 @@ AutoAgentTestRepo/
 │   ├── nelson_time.py
 │   ├── counter.py
 │   ├── counter_cli.py
-│   └── location.py
+│   ├── location.py
+│   └── math_utils.py
 ├── tests/
 │   ├── __init__.py
 │   ├── test_string_utils.py
@@ -497,6 +542,7 @@ AutoAgentTestRepo/
 │   ├── test_counter.py
 │   ├── test_counter_cli.py
 │   ├── test_location.py
+│   ├── test_math_utils.py
 │   └── features/
 │       ├── __init__.py
 │       ├── counter.feature
@@ -512,7 +558,8 @@ AutoAgentTestRepo/
 │   ├── api_integration.md
 │   ├── counter_api.md
 │   ├── counter_display.md
-│   └── architecture.md
+│   ├── architecture.md
+│   └── pi_calculation.md
 ├── .gitignore
 ├── .mypy.ini
 ├── pyproject.toml
@@ -544,6 +591,7 @@ For detailed API documentation, see:
 - [String Utils Documentation](docs/string_utils.md)
 - [API Integration Documentation](docs/api_integration.md)
 - [Location Architecture Documentation](docs/architecture.md)
+- [Pi Calculation Documentation](docs/pi_calculation.md)
 
 ## Contributing
 
