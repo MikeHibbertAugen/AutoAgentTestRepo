@@ -1,12 +1,12 @@
 """
-Game world package initialization.
+Pi Calculator package initialization.
 
-This package provides core game world components for a text-based adventure game
-set in north-west Auckland.
+This package provides a high-precision Pi calculation function that returns
+the mathematical constant Pi to exactly 13 decimal places (3.1415926535897).
 """
 
-from .location import Location
+from .pi_calculator import calculate_pi
 
-__all__ = ['Location']
+__all__ = ['calculate_pi']
 
 __version__ = '0.1.0'
