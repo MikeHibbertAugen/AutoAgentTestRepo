@@ -21,7 +21,11 @@ target-version = "py39"
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
-addopts = "-v --cov=src --cov-report=term-missing --cov-report=html"
+addopts = "-v --cov=src --cov-report=term-missing --cov-report=html --import-mode=importlib"
+# Put src/ on the path so both `src.<mod>` and top-level package imports
+# (e.g. `yfinance_mcp`) resolve. --import-mode=importlib (in addopts) keeps the
+# repo-root __init__.py from being treated as a package during collection.
+pythonpath = [".", "src"]
 
 [tool.coverage.run]
 source = ["src"]

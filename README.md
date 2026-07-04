@@ -2,6 +2,19 @@
 
 This is a test repository for string manipulation utilities, timezone services, a configurable counter implementation, and a text-based adventure game world location system.
 
+## yfinance-cache MCP server
+
+`src/yfinance_mcp/` is an [MCP](https://modelcontextprotocol.io) server that
+connects `yfinance` market data to Claude, **caching** OHLCV, fundamentals,
+news, and business info per ticker, and deriving SMAs, breakouts, and
+volume-trend changes from daily prices. See
+[docs/yfinance_mcp.md](docs/yfinance_mcp.md) for the full guide.
+
+```bash
+pip install -r src/yfinance_mcp/requirements.txt
+python -m yfinance_mcp    # stdio MCP server
+```
+
 ## Features
 
 This package provides string manipulation utilities, timezone services, a counter class, and a location-based game world system with a focus on type safety, comprehensive testing, and clean code practices.
